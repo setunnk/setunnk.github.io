@@ -16,13 +16,15 @@
     .config-inline { margin: 12px 0; font-size: 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 15px; }
     .config-inline div { display: flex; align-items: center; }
     
-    input[type="text"], input[type="number"] { padding: 6px 8px; border: 1px solid #ccc; border-radius: 4px; margin-left: 5px; }
+    input[type="text"], input[type="number"], select { padding: 6px 8px; border: 1px solid #ccc; border-radius: 4px; margin-left: 5px; }
     input[type="text"] { width: 120px; }
     input[type="number"] { width: 70px; }
+    select { width: 140px; background-color: #fff; }
     
-    /* 大批量图片生成的输入框保持原样 */
-    .section input[type="text"] { width: 280px; margin: 8px 0; }
+    /* 大批量图片生成的输入框样式 */
+    .section input[type="text"] { width: 150px; margin: 8px 0; }
     .section input[type="number"] { width: 80px; margin: 8px 0; }
+    .section select { width: 168px; margin: 8px 0; }
     .section label { display: inline-block; min-width: 110px; }
 </style>
 </head>
@@ -55,32 +57,31 @@
 
 
 <div class="section">
-<h2>批量生成图片链接（r2.setutime.com）</h2>
+<h2>批量生成图片链接</h2>
 <p>固定域名：https://r2.setutime.com</p>
 
 <div>
-    <label>文件夹前缀：</label>
-    <input type="text" id="prefix" value="zrsetu">
+    <label>目录选择：</label>
+    <select id="folderSelect">
+        <option value="zrsetu_pic" selected>zrsetu_pic</option>
+        <option value="setu_pic">setu_pic</option>
+    </select>
 </div>
 
 <div>
-    <label>子目录/编号：</label>
-    <input type="text" id="number" value="3">
+    <label>文件名基础/期号：</label>
+    <input type="text" id="picIssue" value="pic-1">
+    <span style="font-size:12px; color:#888; margin-left:10px;">(系统会自动在后面加上 “-序号”)</span>
 </div>
 
 <div>
-    <label>文件名基础：</label>
-    <input type="text" id="baseName" value="pic">
-</div>
-
-<div>
-    <label>后缀：</label>
-    <input type="text" id="suffix" value="webp">
+    <label>文件后缀：</label>
+    <input type="text" id="picSuffix" value="webp">
 </div>
 
 <div>
     <label>生成数量：</label>
-    <input type="number" id="count" value="80" min="1" max="9999">
+    <input type="number" id="picCount" value="80" min="1" max="9999">
 </div>
 
 <div style="margin-top:15px;">
@@ -145,20 +146,22 @@ function generateCombinedHTML() {
     document.getElementById("output").value = results.join("\n\n\n");
 }
 
-// 图片批量URL生成（保持独立功能）
+// 图片批量URL生成（全新改版）
 function generateBatchUrls() {
-    const prefix = document.getElementById("prefix").value.trim() || "zrsetu";
-    const number = document.getElementById("number").value.trim() || "1";
-    const baseName = document.getElementById("baseName").value.trim() || "pic";
-    const suffix = document.getElementById("suffix").value.trim() || "webp";
-    const count = parseInt(document.getElementById("count").value) || 80;
+    const folder = document.getElementById("folderSelect").value;
+    const picIssue = document.getElementById("picIssue").value.trim() || "pic-1";
+    const suffix = document.getElementById("picSuffix").value.trim() || "webp";
+    const count = parseInt(document.getElementById("picCount").value) || 80;
 
     if (count < 1 || count > 9999) return;
 
+    // 清理后缀可能带有点号(.)的情况
+    const cleanSuffix = suffix.startsWith('.') ? suffix.slice(1) : suffix;
+
     const lines = [];
     for(let i = 1; i <= count; i++) {
-        const filename = `${baseName}-${i}.${suffix}`;
-        const url = `https://r2.setutime.com/${prefix}/${number}/${filename}`;
+        // 格式：https://r2.setutime.com/目录/文件名基础-序号.后缀
+        const url = `https://r2.setutime.com/${folder}/${picIssue}-${i}.${cleanSuffix}`;
         lines.push(url);
     }
     document.getElementById("batchOutput").value = lines.join("\n");
@@ -173,17 +176,16 @@ function clearCombinedAll() {
     document.getElementById("inputUrls").value = ""; 
     document.getElementById("videoIssue").value = "1"; 
     localStorage.removeItem("videoIssue"); 
-    document.getElementById("videoCount").value = ""; // 清空也默认留空
+    document.getElementById("videoCount").value = ""; 
     document.getElementById("output").value = ""; 
 }
 
-// 清空批量图片URL生成区
+// 清空批量图片URL生成区（更新重置默认值）
 function clearBatch() { 
-    document.getElementById("prefix").value = "zrsetu"; 
-    document.getElementById("number").value = "3"; 
-    document.getElementById("baseName").value = "pic"; 
-    document.getElementById("suffix").value = "webp"; 
-    document.getElementById("count").value = "80"; 
+    document.getElementById("folderSelect").value = "zrsetu_pic"; 
+    document.getElementById("picIssue").value = "pic-1"; 
+    document.getElementById("picSuffix").value = "webp"; 
+    document.getElementById("picCount").value = "80"; 
     document.getElementById("batchOutput").value = ""; 
 }
 </script>
