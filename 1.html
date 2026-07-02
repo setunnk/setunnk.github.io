@@ -38,6 +38,13 @@
 <div class="config-inline">
     <strong>视频配置：</strong>
     <div>
+        <label>视频目录</label>
+        <select id="videoFolder">
+            <option value="zrsetu" selected>/zrsetu</option>
+            <option value="setu">/setu</option>
+        </select>
+    </div>
+    <div>
         <label>期号</label>
         <input type="text" id="videoIssue" onblur="saveSetting('videoIssue', this.value)" value="1">
     </div>
@@ -123,6 +130,7 @@ function generateCombinedHTML() {
     }
 
     // --- 处理视频部分 ---
+    const videoFolder = document.getElementById("videoFolder").value; // 获取新选择的视频目录
     const issue = document.getElementById("videoIssue").value.trim() || "1";
     saveSetting("videoIssue", issue); // 自动保存期号
     
@@ -134,7 +142,7 @@ function generateCombinedHTML() {
         for(let i = 1; i <= count; i++) {
             const item = `<div class="image-item">
   <video class="responsive-video" controls preload="metadata" playsinline webkit-playsinline>
-    <source src="https://r2.setutime.com/zrsetu/video-${issue}-${i}.mp4#t=0.1" type="video/mp4">
+    <source src="https://r2.setutime.com/${videoFolder}/video-${issue}-${i}.mp4#t=0.1" type="video/mp4">
   </video>
 </div>`;
             videoLines.push(item);
@@ -177,6 +185,7 @@ function copyBatchResult() { document.getElementById("batchOutput").select(); do
 // 清空合并功能区
 function clearCombinedAll() { 
     document.getElementById("inputUrls").value = ""; 
+    document.getElementById("videoFolder").value = "zrsetu"; // 恢复视频目录默认值
     document.getElementById("videoIssue").value = "1"; 
     localStorage.removeItem("videoIssue"); 
     document.getElementById("videoCount").value = ""; 
