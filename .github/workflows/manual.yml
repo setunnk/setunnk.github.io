@@ -11,33 +11,15 @@ jobs:
   update:
     runs-on: ubuntu-latest
     steps:
-      # 1. 恢复为你原有的 v6 版本，并确保拉取深度足够进行差异比对
+      # 1. 升级拉取仓库代码的插件版本以消除内部 Node 20 的警告
       - uses: actions/checkout@v6
-        with:
-          fetch-depth: 2 
-
-      # 🌟 核心拦截步骤：检查是否有新增(A)或删除(D)的文件
-      - name: 检查是否包含删除或新增操作
-        id: change_check
-        run: |
-          CHANGES=$(git diff --name-only --diff-filter=AD HEAD~1 HEAD -- 'setu' 'zrsetu' || true)
-          
-          if [ -z "$CHANGES" ]; then
-            echo "检测结果：本次提交仅为内容修改，没有发生文件的删除或新增。正在拦截自动运行..."
-            echo "should_run=false" >> $GITHUB_OUTPUT
-          else
-            echo "检测结果：发现文件发生新增或删除操作，允许运行自动化脚本。"
-            echo "should_run=true" >> $GITHUB_OUTPUT
-          fi
-
+      
       # 2. 升级安装 Node 环境的插件版本，并将 node-version 指定为 24
       - uses: actions/setup-node@v6
-        if: steps.change_check.outputs.should_run == 'true' # 🌟 已修正为正确的点语法（.）
         with:
           node-version: '24'
           
       - name: 生成 data.json 及分页数据
-        if: steps.change_check.outputs.should_run == 'true' # 🌟 已修正为正确的点语法（.）
         run: |
           cat > generate.js << 'EOF'
           const fs = require('fs');
@@ -114,7 +96,6 @@ jobs:
           EOF
           node generate.js
       - name: 提交更新
-        if: steps.change_check.outputs.should_run == 'true' # 🌟 已修正为正确的点语法（.）
         run: |
           git config user.name "AutoBot"
           git config user.email "bot@github.com"
