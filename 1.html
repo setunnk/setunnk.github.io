@@ -70,7 +70,7 @@
 
 <div>
     <label>文件名基础/期号：</label>
-    <input type="text" id="picIssue" value="pic-1">
+    <input type="text" id="picIssue" value="pic-">
     <span style="font-size:12px; color:#888; margin-left:10px;">(系统会自动在后面加上 “-序号”)</span>
 </div>
 
@@ -81,7 +81,7 @@
 
 <div>
     <label>生成数量：</label>
-    <input type="number" id="picCount" value="80" min="1" max="9999">
+    <input type="number" id="picCount" value="" min="1" max="9999" placeholder="留空不生成">
 </div>
 
 <div style="margin-top:15px;">
@@ -146,13 +146,16 @@ function generateCombinedHTML() {
     document.getElementById("output").value = results.join("\n\n\n");
 }
 
-// 图片批量URL生成（全新改版）
+// 图片批量URL生成
 function generateBatchUrls() {
     const folder = document.getElementById("folderSelect").value;
-    const picIssue = document.getElementById("picIssue").value.trim() || "pic-1";
+    const picIssue = document.getElementById("picIssue").value.trim() || "pic-";
     const suffix = document.getElementById("picSuffix").value.trim() || "webp";
-    const count = parseInt(document.getElementById("picCount").value) || 80;
+    
+    const countInput = document.getElementById("picCount").value.trim();
+    if (countInput === "") return; // 如果留空则不执行生成
 
+    const count = parseInt(countInput);
     if (count < 1 || count > 9999) return;
 
     // 清理后缀可能带有点号(.)的情况
@@ -183,9 +186,9 @@ function clearCombinedAll() {
 // 清空批量图片URL生成区（更新重置默认值）
 function clearBatch() { 
     document.getElementById("folderSelect").value = "zrsetu_pic"; 
-    document.getElementById("picIssue").value = "pic-1"; 
+    document.getElementById("picIssue").value = "pic-"; 
     document.getElementById("picSuffix").value = "webp"; 
-    document.getElementById("picCount").value = "80"; 
+    document.getElementById("picCount").value = ""; 
     document.getElementById("batchOutput").value = ""; 
 }
 </script>
