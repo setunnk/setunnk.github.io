@@ -1,38 +1,4 @@
-name: Deploy GitHub Pages
-
-on:
-  push:
-    branches: ["main"]   # 当你手动或自动往 main 分支推文件时触发
-  workflow_dispatch:     # 允许你在后台手动点击触发
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-# 确保同一时间只有一个发布任务在跑，新的来了自动掐断旧的，防止死锁
-concurrency:
-  group: "pages"
-  cancel-in-progress: true 
-
-jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: 1. 拉取最新代码
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1 # 极限提升拉取速度
-
-      - name: 2. 安装 Node 环境
-        uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-
-      - name: 3. 核心步骤：直接在发布前原地生成最新的 data.json 和 1.json
+- name: 3. 核心步骤：直接在发布前原地生成最新的 data.json 和 1.json
         run: |
           cat > generate.js << 'EOF'
           const fs = require('fs');
@@ -41,16 +7,26 @@ jobs:
           function extractCaption(filePath) {
             try {
               const content = fs.readFileSync(filePath, 'utf8');
+              // 1. 优先匹配新的 <div id="setu-title" class="title-capsule"> 格式
               let regex = /<div[^>]*id=[\"']?setu-title[\"']?[^>]*class=[\"']?title-capsule[\"']?[^>]*>([\s\S]*?)<\/div>/i;
               let match = regex.exec(content);
+
+              // 2. 如果没匹配到，再尝试兼容旧的 <p style="text-align:left; font-size:16px"> 格式
               if (!match || !match[1]) {
-                regex = /<p[^>]*style.*?>([\s\S]*?)<\/p>/i;
+                regex = /<p[^>]*style\s*=\s*[\"'][^\"']*?\btext-align\s*:\s*left[^\"']*?font-size\s*:\s*16px[^>]*>([\s\S]*?)<\/p>/gi;
                 match = regex.exec(content);
               }
+
+              // 3. 只要匹配到了，移除 HTML 标签后，其余内容全量保留
               if (match && match[1]) {
-                return match[1].replace(/<[^>]+>/g, '').replace(/#\s*\S*/, '').replace(/\[.*?\]/g, '').trim();
+                let text = match[1]
+                  .replace(/<[^>]+>/g, '')     // 仅移除所有 HTML 标签
+                  .trim();
+                return text;
               }
-            } catch (e) {}
+            } catch (e) {
+              console.log(`读取失败 ${filePath}: ${e.message}`);
+            }
             return '';
           }
 
@@ -94,18 +70,6 @@ jobs:
             };
             fs.writeFileSync(path.join(pageDir, `${p}.json`), JSON.stringify(pageData, null, 2));
           }
-          console.log('🎉 内存中 JSON 及分页数据原地动态切分成功！');
+          console.log('🎉 内存中 JSON 及分页数据原地全量切分成功！');
           EOF
           node generate.js
-
-      - name: 4. 准备托管配置
-        uses: actions/configure-pages@v4
-
-      - name: 5. 统一打包（此时包里已经包含了刚才热腾腾生成的新 1.json 和 data.json）
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ${{ github.workspace }}
-
-      - name: 6. 正式发布到 GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
