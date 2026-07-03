@@ -2,17 +2,18 @@ name: Deploy GitHub Pages
 
 on:
   push:
-    branches: ["main"] # 监听 main 分支的动静
+    branches: ["main"]   # 当你手动或自动往 main 分支推文件时触发
+  workflow_dispatch:     # 允许你在后台手动点击触发
 
-# 分配 Pages 的发布权限
 permissions:
   contents: read
   pages: write
   id-token: write
 
+# 确保同一时间只有一个发布任务在跑，新的来了自动掐断旧的，防止死锁
 concurrency:
   group: "pages"
-  cancel-in-progress: true # 重点：新推送来时，立刻掐断旧的发布，全力跑新的
+  cancel-in-progress: true 
 
 jobs:
   deploy:
@@ -21,17 +22,90 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: 1. 拉取最新代码
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1 # 极限提升拉取速度
 
-      - name: Setup Pages
+      - name: 2. 安装 Node 环境
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: 3. 核心步骤：直接在发布前原地生成最新的 data.json 和 1.json
+        run: |
+          cat > generate.js << 'EOF'
+          const fs = require('fs');
+          const path = require('path');
+
+          function extractCaption(filePath) {
+            try {
+              const content = fs.readFileSync(filePath, 'utf8');
+              let regex = /<div[^>]*id=[\"']?setu-title[\"']?[^>]*class=[\"']?title-capsule[\"']?[^>]*>([\s\S]*?)<\/div>/i;
+              let match = regex.exec(content);
+              if (!match || !match[1]) {
+                regex = /<p[^>]*style.*?>([\s\S]*?)<\/p>/i;
+                match = regex.exec(content);
+              }
+              if (match && match[1]) {
+                return match[1].replace(/<[^>]+>/g, '').replace(/#\s*\S*/, '').replace(/\[.*?\]/g, '').trim();
+              }
+            } catch (e) {}
+            return '';
+          }
+
+          function scanDir(dirName) {
+            const dirPath = path.join(__dirname, dirName);
+            if (!fs.existsSync(dirPath)) return [];
+            return fs.readdirSync(dirPath)
+              .filter(file => file.endsWith('.html') && file !== 'index.html')
+              .map(file => ({
+                file: file,
+                caption: extractCaption(path.join(dirPath, file))
+              }))
+              .sort((a, b) => {
+                const numA = parseInt(a.file.match(/\d+/)?.[0] || 0);
+                const numB = parseInt(b.file.match(/\d+/)?.[0] || 0);
+                return numB - numA;
+              });
+          }
+
+          console.log('正在扫描目录中...');
+          const setuItems = scanDir('setu');
+          const zrsetuItems = scanDir('zrsetu');
+          const updatedTime = new Date().toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'}).replace(/\//g,'-');
+
+          // 全量包
+          const allData = { updated: updatedTime, setu: setuItems, zrsetu: zrsetuItems };
+          fs.writeFileSync('data.json', JSON.stringify(allData, null, 2));
+
+          // 切分分页数据
+          const PAGESIZE = 50;
+          const pageDir = path.join(__dirname, 'data_pages');
+          if (!fs.existsSync(pageDir)) fs.mkdirSync(pageDir);
+
+          const totalPages = Math.max(Math.ceil(setuItems.length / PAGESIZE), Math.ceil(zrsetuItems.length / PAGESIZE));
+          for (let p = 1; p <= totalPages; p++) {
+            const start = (p - 1) * PAGESIZE;
+            const pageData = {
+              updated: updatedTime,
+              setu: setuItems.slice(start, start + PAGESIZE),
+              zrsetu: zrsetuItems.slice(start, start + PAGESIZE)
+            };
+            fs.writeFileSync(path.join(pageDir, `${p}.json`), JSON.stringify(pageData, null, 2));
+          }
+          console.log('🎉 内存中 JSON 及分页数据原地动态切分成功！');
+          EOF
+          node generate.js
+
+      - name: 4. 准备托管配置
         uses: actions/configure-pages@v4
 
-      - name: Upload artifact
+      - name: 5. 统一打包（此时包里已经包含了刚才热腾腾生成的新 1.json 和 data.json）
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '.' # 上传整个根目录（包含你的各个静态 HTML 目录）
+          path: ${{ github.workspace }}
 
-      - name: Deploy to GitHub Pages
+      - name: 6. 正式发布到 GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
