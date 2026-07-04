@@ -4,337 +4,402 @@
 <meta charset="UTF-8">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <link rel="icon" href="https://wdcdn.qpic.cn/MTMxMDI2NjEwNzAzNzc4NzY_582527_m5n34EQ_C6U8f2WE_1782832113" type="image/png">
 <meta name="description" content="点击前往SetuTime~">
 <title>SetuTime！</title>
 <style>
   /* 基础全局样式 - 默认为蓝色调 */
-  body{margin:0;font-family:"Segoe UI","Helvetica Neue",Arial,sans-serif;background:#ffffff;color:#374151;min-height:100vh;font-size:15px;overflow-x:hidden}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:#ffffff;color:#374151;min-height:100vh;font-size:15px;overflow-x:hidden;-webkit-font-smoothing:antialiased}
   header, .container {opacity: 0;transform: translateY(15px);transition: opacity 0.5s ease-out, transform 0.5s ease-out}
   .loaded header, .loaded .container {opacity: 1;transform: translateY(0)}
-  ul.list li {opacity: 0;transform: translateY(20px);transition: opacity 0.6s ease-out, transform 0.6s cubic-bezier(0.2, 0.8, 0.4, 1)}
-  .loaded ul.list li {opacity: 1;transform: translateY(0)}
-  .loaded ul.list li:nth-child(1) { transition-delay: 0.05s; }
-  .loaded ul.list li:nth-child(2) { transition-delay: 0.10s; }
-  .loaded ul.list li:nth-child(3) { transition-delay: 0.15s; }
-
-  header{position:sticky;top:0;z-index:100;text-align:center;padding:1rem 0.5rem;transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);pointer-events: none}
-  .capsule{display: inline-block;background:#ffffffcc;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:999px;box-shadow:0 8px 32px rgba(0,0,0,0.12);border:1px solid rgba(255,255,255,0.6);max-width: 90vw;width: fit-content;min-width: 260px;margin:12px auto;padding:0.8rem 1.5rem;font-size:1.7rem;font-weight:700;color:#3b82f6;pointer-events: auto;box-sizing: border-box;transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1)}
-  header.hidden .capsule {transform: translateY(-20px) scale(0.85);opacity: 0}
-
-  .container{max-width:860px;margin:1.5rem auto;padding:0 1rem 3rem}
-  .section-header-row {display: flex; align-items: center; justify-content: space-between; margin: 2rem 0 1rem;}
-
-  .section-title {
-    position: relative;
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: #2563eb;
-    margin: 0;
-    display: inline-flex;
-    align-items: center;
-    padding: 8px 80px 8px 12px;
-    background: linear-gradient(to right, rgba(59, 130, 246, 0.12) 0%, rgba(59, 130, 246, 0.04) 30%, transparent 100%);
-    border-radius: 4px;
-    border-left: 3px solid #3b82f6;
-    letter-spacing: 1px;
-    user-select: none;
-  }
+  ul.list li {opacity: 0;transform: translateY(10px);transition: opacity 0.35s ease-out, transform 0.35s cubic-bezier(0.2, 1, 0.2, 1)}
+  .loaded ul.list li.show {opacity: 1;transform: translateY(0)}
   
-  .search-trigger-right {
-    display: flex;
-    align-items: center; 
-    background: #f0f4ff; 
-    padding: 7px 18px; 
-    border-radius: 999px; 
-    border: 1px solid #d1d5db; 
-    cursor: pointer; 
-    transition: 0.2s; 
-    min-width: 220px;
-    justify-content: space-between;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  }
-  .search-trigger-right:hover {background: #e5edff; border-color: #3b82f6;}
-  .search-trigger-right span {color: #6b7280; font-size: 0.9rem;}
-  .search-trigger-right kbd {background: #fff; border: 1px solid #d1d5db; border-radius: 4px; padding: 1px 4px; font-size: 0.7rem; color: #9ca3af;}
-
-  /* 列表与通用组件样式 */
-  ul.list{list-style:none;padding:0;margin:0}
-  ul.list li{background:#fff;border:1px solid #cbd5e1;border-radius:12px;padding:0.85rem 1rem;margin-bottom:0.7rem;box-shadow:0 4px 12px rgba(0,0,0,0.04);cursor:pointer;transition:all .25s;display:flex;align-items:center;gap:0.7rem;font-size:0.98rem}
-  ul.list li:hover,ul.list li:active{transform:translateY(-2px);box-shadow:0 8px 20px rgba(59,130,246,0.15);border-color:#93bbfc;background:#f8faff}
-  ul.list li .num{color:#3b82f6;font-weight:600;font-size:1rem;white-space:nowrap;flex-shrink:0}
-  ul.list li .caption{color:#4b5563;font-size:0.88rem;opacity:0.9;line-height:1.4}
+  header{background:linear-gradient(135deg,#428cca,#53a3e6);color:#ffffff;padding:40px 20px;text-align:center;box-shadow:0 4px 20px rgba(66,140,202,0.15);position:relative}
+  header h1{margin:0;font-size:32px;font-weight:700;letter-spacing:1px;text-shadow:0 2px 4px rgba(0,0,0,0.1)}
+  header p{margin:8px 0 0;opacity:0.9;font-size:15px;font-weight:400}
   
-  .pagination{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:0.5rem;margin:2.2rem 0 1rem}
-  .pagination button{min-width:38px;height:38px;background:#ffffff;color:#5d8eff;border:none;border-radius:10px;font-size:0.9rem;font-weight:500;cursor:pointer;transition:all .3s ease;box-shadow:0 2px 6px rgba(93,142,255,0.15)}
-  .pagination button:hover{transform:translateY(-3px);box-shadow:0 6px 16px rgba(93,142,255,0.28);background:#f8fbff}
-  .pagination button.active{background:linear-gradient(135deg,#a8c0ff,#e0e7ff);color:#2563eb;font-weight:600;box-shadow:0 0 0 3px rgba(168,192,255,0.4)}
-
-  .qq-button{margin: 18px auto 28px;text-align: center}
-  .qq-button a{display: inline-block;width: calc(100% - 60px);max-width: 420px;background: linear-gradient(135deg, #60a5fa, #3b82f6);color: #fff;padding: 11px 0;border-radius: 999px;text-decoration: none;font-weight: 600;font-size: 0.98rem;box-shadow: 0 4px 12px rgba(92,168,230,.4);transition: .3s}
-  .qq-button a:hover{background: linear-gradient(135deg, #4b96d8, #2563eb);transform: translateY(-2px)}
-
-  /* --- Cos写真分类：哔哩哔哩粉配色专区 --- */
-  .cos-theme .section-title { 
-    color: #fb7299; 
-    border-left-color: #fb7299;
-    background: linear-gradient(to right, rgba(251, 114, 153, 0.12) 0%, rgba(251, 114, 153, 0.04) 30%, transparent 100%);
-  }
+  .container{max-width:700px;margin:30px auto;padding:0 20px;box-sizing:border-box;padding-bottom:100px}
   
-  .cos-theme .search-trigger-right { border-color: #fb7299; background: #fff5f8; }
-  .cos-theme .search-trigger-right:hover { background: #ffeef3; border-color: #fb7299; }
+  /* 导航 Tab 样式：胶囊形态加毛玻璃微特效 */
+  .tabs{display:flex;background:rgba(243,244,246,0.86);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:5px;border-radius:30px;margin-bottom:25px;position:relative;border:1px solid #e5e7eb;touch-action:manipulation}
+  .tab-item{flex:1;text-align:center;padding:12px 0;font-weight:600;font-size:15px;color:#4b5563;cursor:pointer;z-index:2;transition:color 0.2s, transform 0.1s;border-radius:25px;-webkit-tap-highlight-color:transparent;user-select:none}
+  .tab-item:active{transform:scale(0.96);opacity:0.9}
+  .tab-item.active{color:#ffffff}
+  .tab-slider{position:absolute;top:5px;left:5px;width:calc(50% - 5px);height:calc(100% - 10px);background:#428cca;border-radius:25px;z-index:1;transition:transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), background 0.3s;box-shadow:0 4px 12px rgba(66,140,202,0.25)}
   
-  .cos-theme .qq-button a { 
-    background: linear-gradient(135deg, #ff85ad, #fb7299);
-    box-shadow: 0 4px 12px rgba(251, 114, 153, 0.35); 
-  }
-  .cos-theme .qq-button a:hover { background: linear-gradient(135deg, #fb7299, #fa5a87); }
+  /* 列表流样式 */
+  ul.list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:14px}
+  ul.list li{background:#ffffff;border:1px solid #e5e7eb;border-radius:18px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:all 0.25s ease;box-shadow:0 2px 6px rgba(0,0,0,0.02);-webkit-tap-highlight-color:transparent}
+  ul.list li:hover{border-color:#428cca;box-shadow:0 6px 16px rgba(66,140,202,0.08)}
+  ul.list li:active{transform:scale(0.98);background:#f9fafb}
   
-  .cos-theme ul.list li .num { color: #fb7299; }
-  .cos-theme ul.list li:hover { 
-    border-color: #ffb3c9; 
-    box-shadow: 0 8px 20px rgba(251, 114, 153, 0.15);
-    background: #fffcfd; 
-  }
+  .item-left{display:flex;flex-direction:column;gap:4px;flex:1;min-width:0;text-align:left}
+  .item-title{font-size:16px;font-weight:600;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .item-sub{font-size:13px;color:#6b7280;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   
-  .cos-theme .pagination button { color: #fb7299; }
-  .cos-theme .pagination button.active { 
-    background: linear-gradient(135deg, #ffb3c9, #ffccd9); 
-    color: #fb7299;
-    box-shadow: 0 0 0 3px rgba(251, 114, 153, 0.2); 
-  }
-
-  /* 搜索弹窗样式 */
-  .search-overlay {display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.35); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); z-index: 1000; justify-content: center; align-items: flex-start; padding-top: 12vh; opacity: 0; transition: opacity 0.1s ease-out;}
-  .search-overlay.active {display: flex; opacity: 1;}
-  .search-modal {width: 95%; max-width: 600px; background: #fff; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; transform: scale(0.9); transition: transform 0.1s ease-out;}
-  .search-overlay.active .search-modal {transform: scale(1);}
-  .search-overlay.closing {opacity: 0;}
-  .search-overlay.closing .search-modal {transform: scale(0.9);}
-
-  .search-box {display: flex; align-items: center; padding: 15px 20px; border-bottom: 1px solid #f3f4f6}
-  .search-box input {flex: 1; border: none; outline: none; font-size: 1.1rem; margin-left: 10px; color: #1f2937; background: transparent}
-  .search-box .esc {font-size: 0.75rem; color: #9ca3af; border: 1px solid #e5e7eb; padding: 2px 6px; border-radius: 4px; cursor: pointer}
-  .search-results {overflow-y: auto; max-height: 60vh; padding: 8px}
-  .search-results .item {padding: 12px 16px; border-radius: 8px; cursor: pointer; transition: 0.1s; display: flex; flex-direction: column; gap: 4px;}
-  .search-results .item:hover {background: #f3f8ff;}
-  .search-results .item .title {font-weight: 700; color: #3b82f6; font-size: 0.95rem}
-  .search-results .item .sub {font-size: 0.85rem; color: #4b5563; line-height: 1.4}
-
-  @media (max-width: 600px) {
-    .search-trigger-right { min-width: 140px; padding: 6px 12px; }
-    .search-trigger-right kbd { display: none; }
-    .section-title { font-size: 1rem; padding-right: 50px; }
-  }
+  .item-btn{background:#f3f4f6;color:#4b5563;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:600;transition:all 0.25s;flex-shrink:0;user-select:none}
+  ul.list li:hover .item-btn{background:#428cca;color:#ffffff}
+  
+  /* 页面加载骨架屏 */
+  .skeleton-list{display:flex;flex-direction:column;gap:14px}
+  .skeleton-item{height:72px;background:linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 37%, #f3f4f6 63%);background-size:400% 100%;animation:skeleton-loading 1.4s ease infinite;border-radius:18px}
+  @keyframes skeleton-loading{0%{background-position:100% 0}100%{background-position:0 0}}
+  
+  /* 标准分页控制组件 */
+  .pagination-container {display:flex;align-items:center;justify-content:space-between;margin-top:30px;gap:10px;user-select:none}
+  .page-btn {flex:1;max-width:100px;text-align:center;padding:12px 0;background:#ffffff;border:1px solid #e5e7eb;border-radius:22px;color:#4b5563;font-weight:600;font-size:14px;cursor:pointer;transition:all 0.2s;-webkit-tap-highlight-color:transparent}
+  .page-btn:hover:not(.disabled) {border-color:#428cca;color:#428cca;background:rgba(66,140,202,0.02)}
+  .page-btn:active:not(.disabled) {transform:scale(0.95)}
+  .page-btn.disabled {color:#d1d5db;background:#f9fafb;border-color:#e5e7eb;cursor:not-allowed;transform:none;opacity:0.6}
+  .page-info {font-size:14px;color:#6b7280;font-weight:600}
+  
+  /* 搜索图标悬浮按钮 */
+  .search-trigger {position:fixed;bottom:25px;right:25px;width:54px;height:54px;background:#428cca;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(66,140,202,0.4);cursor:pointer;z-index:99;transition:all 0.25s ease;-webkit-tap-highlight-color:transparent}
+  .search-trigger:hover {transform:scale(1.08) translateY(-2px);background:#53a3e6;box-shadow:0 8px 24px rgba(66,140,202,0.5)}
+  .search-trigger:active {transform:scale(0.95)}
+  .search-trigger svg {width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+  
+  /* 全屏搜索面板 */
+  .search-overlay {position:fixed;inset:0;background:rgba(255,255,255,0.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);z-index:1000;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity 0.3s ease}
+  .search-overlay.active {opacity:1;pointer-events:auto}
+  .search-header {padding:20px;display:flex;align-items:center;max-width:600px;width:100%;margin:0 auto;box-sizing:border-box;gap:15px}
+  .search-input-wrap {position:relative;flex:1}
+  .search-input {width:100%;height:46px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:23px;padding:0 20px 0 45px;font-size:16px;color:#111827;outline:none;box-sizing:border-box;transition:all 0.25s}
+  .search-input:focus {background:#ffffff;border-color:#428cca;box-shadow:0 0 0 3px rgba(66,140,202,0.15)}
+  .search-icon-left {position:absolute;left:18px;top:13px;color:#9ca3af}
+  .search-icon-left svg {width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.5}
+  .search-close {font-size:15px;color:#6b7280;cursor:pointer;font-weight:600;padding:5px 10px;-webkit-tap-highlight-color:transparent;user-select:none}
+  .search-close:hover {color:#111827}
+  
+  .search-results {flex:1;overflow-y:auto;max-width:600px;width:100%;margin:0 auto;padding:10px 20px 40px;box-sizing:border-box}
+  .search-results .item {background:#ffffff;border:1px solid #e5e7eb;border-radius:16px;padding:14px 18px;margin-bottom:12px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:all 0.2s}
+  .search-results .item:hover {border-color:#428cca;background:rgba(66,140,202,0.01);transform:translateY(-1px)}
+  .search-results .item .title {font-weight:600;color:#111827;font-size:15px;flex-shrink:0;margin-right:15px}
+  .search-results .item .sub {color:#6b7280;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;text-align:right}
+  
+  /* 粉色调专属覆盖样式 */
+  body.pink-theme header{background:linear-gradient(135deg,#f8b8c8,#fca1b7);box-shadow:0 4px 20px rgba(248,184,200,0.25)}
+  body.pink-theme .tab-slider{background:#f8b8c8;box-shadow:0 4px 12px rgba(248,184,200,0.35)}
+  body.pink-theme ul.list li:hover{border-color:#f8b8c8;box-shadow:0 6px 16px rgba(248,184,200,0.12)}
+  body.pink-theme ul.list li:hover .item-btn{background:#f8b8c8;color:#ffffff}
+  body.pink-theme .page-btn:hover:not(.disabled){border-color:#f8b8c8;color:#f8b8c8;background:rgba(248,184,200,0.03)}
+  body.pink-theme .search-trigger {background:#f8b8c8;box-shadow:0 6px 20px rgba(248,184,200,0.5)}
+  body.pink-theme .search-trigger:hover {background:#fca1b7;box-shadow:0 8px 24px rgba(248,184,200,0.6)}
+  body.pink-theme .search-input:focus {border-color:#f8b8c8;box-shadow:0 0 0 3px rgba(248,184,200,0.15)}
+  body.pink-theme .search-results .item:hover {border-color:#f8b8c8;background:rgba(248,184,200,0.02)}
 </style>
 </head>
-<body ontouchstart="">
-<header id="header">
-  <div class="capsule">奈奈的 SetuTime</div>
+<body>
+
+<header>
+  <h1 id="main-title">SetuTime！</h1>
+  <p id="sub-title">ACGエッチ画像まとめ</p>
 </header>
 
 <div class="container">
-  <div class="section-title">二次元</div>
-  <div class="qq-button">
-    <a href="https://ti.qq.com/open_qq/index2.html?url=mqqapi%3A%2F%2Fuserprofile%2Ffriend_profile_card%3Fsrc_type%3Dweb%26version%3D1.0%26source%3D2%26uin%3D51301105" target="_blank">qq：51301105 添加好友获取更新</a>
+  <div class="tabs">
+    <div class="tab-item active" id="tab-setu">二次元篇</div>
+    <div class="tab-item" id="tab-zrsetu">cos篇</div>
+    <div class="tab-slider" id="tabSlider"></div>
   </div>
-  <ul class="list" id="setu-list">加载中...</ul>
-  <div id="setu-pagination" class="pagination"></div>
 
-  <div class="cos-theme">
-    <div class="section-header-row">
-      <div class="section-title">Cos写真</div>
-      <div class="search-trigger-right" onclick="toggleSearch(true)">
-        <span>搜索...</span>
-        <kbd>Ctrl K</kbd>
-      </div>
-    </div>
-    
-    <div class="qq-button">
-      <a href="https://ti.qq.com/open_qq/index2.html?url=mqqapi%3A%2F%2Fuserprofile%2Ffriend_profile_card%3Fsrc_type%3Dweb%26version%3D1.0%26source%3D2%26uin%3D45503380" target="_blank">qq：45503380 添加好友获取更新</a>
-    </div>
-    <ul class="list" id="zrsetu-list">加载中...</ul>
-    <div id="zrsetu-pagination" class="pagination"></div>
+  <div id="skeleton" class="skeleton-list">
+    <div class="skeleton-item"></div>
+    <div class="skeleton-item"></div>
+    <div class="skeleton-item"></div>
+    <div class="skeleton-item"></div>
+    <div class="skeleton-item"></div>
+  </div>
+
+  <ul class="list" id="contentList" style="display:none;"></ul>
+  
+  <div class="pagination-container" id="paginationCtrl" style="display:none;">
+    <div class="page-btn" id="prevPageBtn" onclick="changePage(-1)">上一页</div>
+    <div class="page-info" id="pageInfo">1 / 1</div>
+    <div class="page-btn" id="nextPageBtn" onclick="changePage(1)">下一页</div>
   </div>
 </div>
 
-<div id="searchOverlay" class="search-overlay" onclick="if(event.target==this)toggleSearch(false)">
-  <div class="search-modal">
-    <div class="search-box">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-      <input type="text" id="searchInput" placeholder="搜索 Coser写真..." autocomplete="off">
-      <div class="esc" onclick="toggleSearch(false)">Esc</div>
+<div class="search-trigger" onclick="toggleSearch(true)">
+  <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+</div>
+
+<div class="search-overlay" id="searchOverlay">
+  <div class="search-header">
+    <div class="search-input-wrap">
+      <div class="search-icon-left">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      </div>
+      <input type="text" class="search-input" id="searchInput" placeholder="搜索本分类下的期号或标题..." oninput="doSearch()">
     </div>
-    <div id="searchResults" class="search-results"></div>
+    <div class="search-close" onclick="toggleSearch(false)">取消</div>
   </div>
+  <div class="search-results" id="searchResults"></div>
 </div>
 
 <script>
-const rootUrl = './';
-const DISPLAY_PER_PAGE = 10; 
-const DATA_PER_JSON = 50;    
-const header = document.getElementById('header');
-let lastScrollY = 0;
-let ticking = false;
-
+let currentTab = 'setu';
+let currentPage = { setu: 1, zrsetu: 1 };
+let cachePages = {}; 
+let allSetuItems = [];
+let allZrsetuItems = [];
 let totalSetuCount = 0;
 let totalZrsetuCount = 0;
-let allZrsetuItems = []; 
 
-const cachePages = {}; 
+const ITEMS_PER_PAGE = 10;
+const SERVER_ITEMS_PER_FILE = 50;
 
-function updateHeader() {
-  const currentScrollY = window.scrollY;
-  if (currentScrollY > lastScrollY && currentScrollY > 10) header.classList.add('hidden');
-  else if (currentScrollY < lastScrollY || currentScrollY <= 10) header.classList.remove('hidden');
-  lastScrollY = currentScrollY;
-  ticking = false;
-}
-
-window.addEventListener('scroll', () => {
-  if (!ticking) { requestAnimationFrame(updateHeader); ticking = true; }
-}, { passive: true });
+const rootUrl = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost' ? '/' : 'https://setutime.com/';
 
 async function fetchJson(url) {
   try {
-    const res = await fetch(`${url}?t=${Date.now()}`);
-    if (!res.ok) throw new Error('Failed');
-    return await res.json();
-  } catch (e) {
-    document.body.innerHTML = '<div style="text-align:center;margin-top:8rem;color:#e74c3c;">加载失败，请刷新重试</div>';
-    throw e;
+    const timestamp = new Date().getTime();
+    const connector = url.includes('?') ? '&' : '?';
+    const response = await fetch(`${url}${connector}t=${timestamp}`);
+    if (!response.ok) throw new Error('Network error');
+    return await response.json();
+  } catch (error) {
+    console.error("Fetch failed:", error);
+    return null;
   }
 }
 
-async function switchPage(uiPage, preferContainerId = null) {
-  const jsonTargetPage = Math.ceil((uiPage * DISPLAY_PER_PAGE) / DATA_PER_JSON);
-
-  if (!cachePages[jsonTargetPage]) {
-    cachePages[jsonTargetPage] = await fetchJson(`${rootUrl}data_pages/${jsonTargetPage}.json`);
+function handleTabClick(type, index) {
+  if (currentTab === type) return;
+  currentTab = type;
+  
+  document.getElementById('searchInput').value = '';
+  document.getElementById('searchResults').innerHTML = '';
+  
+  const slider = document.getElementById('tabSlider');
+  slider.style.transform = `translateX(${index * 100}%)`;
+  
+  const items = document.querySelectorAll('.tab-item');
+  items.forEach((item, i) => i === index ? item.classList.add('active') : item.classList.remove('active'));
+  
+  const mainTitle = document.getElementById('main-title');
+  const subTitle = document.getElementById('sub-title');
+  
+  if (type === 'zrsetu') {
+    document.body.classList.add('pink-theme');
+    mainTitle.innerText = "SetuTime！";
+    subTitle.innerText = "Cosplayエッチ画像まとめ";
+    slider.style.background = '#f8b8c8';
+  } else {
+    document.body.classList.remove('pink-theme');
+    mainTitle.innerText = "SetuTime！";
+    subTitle.innerText = "ACGエッチ画像まとめ";
+    slider.style.background = '#428cca';
   }
   
-  const pageData = cachePages[jsonTargetPage];
-  const relativeStart = ((uiPage - 1) * DISPLAY_PER_PAGE) % DATA_PER_JSON;
-  const relativeEnd = relativeStart + DISPLAY_PER_PAGE;
-
-  if (!preferContainerId || preferContainerId === 'setu-list') {
-    const subset = (pageData.setu || []).slice(relativeStart, relativeEnd);
-    renderListAndPagination(subset, totalSetuCount, 'setu-list', 'setu-pagination', uiPage);
-  }
-  if (!preferContainerId || preferContainerId === 'zrsetu-list') {
-    const subset = (pageData.zrsetu || []).slice(relativeStart, relativeEnd);
-    renderListAndPagination(subset, totalZrsetuCount, 'zrsetu-list', 'zrsetu-pagination', uiPage);
-  }
+  renderCurrentList(true);
 }
 
-function renderListAndPagination(pageItems, totalItemsCount, containerId, paginationId, currentPage) {
-  const container = document.getElementById(containerId);
-  const pagination = document.getElementById(paginationId);
-  const totalPages = Math.ceil(totalItemsCount / DISPLAY_PER_PAGE);
-
-  container.innerHTML = '';
-  pageItems.forEach(item => {
-    const li = document.createElement('li');
-    const num = item.file.match(/\d+/)?.[0] || '?';
-    li.innerHTML = `<span class="num">第${num}期</span>${item.caption ? `<span class="caption">${item.caption}</span>` : ''}`;
-    li.onclick = () => window.location.href = `${rootUrl}${containerId === 'setu-list' ? 'setu' : 'zrsetu'}/${item.file}`;
-    container.appendChild(li);
+async function renderCurrentList(isTabSwitch = false) {
+  const listDiv = document.getElementById('contentList');
+  const paginationCtrl = document.getElementById('paginationCtrl');
+  const skeleton = document.getElementById('skeleton');
+  
+  if (isTabSwitch) {
+    listDiv.style.display = 'none';
+    skeleton.style.display = 'flex';
+    paginationCtrl.style.display = 'none';
+  }
+  
+  const activePage = currentPage[currentTab];
+  const totalCount = currentTab === 'setu' ? totalSetuCount : totalZrsetuCount;
+  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE) || 1;
+  
+  const startIdx = (activePage - 1) * ITEMS_PER_PAGE;
+  const endIdx = activePage * ITEMS_PER_PAGE;
+  
+  const neededFileIndexStart = Math.floor(startIdx / SERVER_ITEMS_PER_FILE) + 1;
+  const neededFileIndexEnd = Math.floor((endIdx - 1) / SERVER_ITEMS_PER_FILE) + 1;
+  
+  for (let p = neededFileIndexStart; p <= neededFileIndexEnd; p++) {
+    if (!cachePages[p]) {
+      if (listDiv.style.display !== 'none') {
+        listDiv.style.opacity = '0.4';
+      }
+      const pageData = await fetchJson(`${rootUrl}data_pages/${p}.json`);
+      if (pageData) {
+        cachePages[p] = pageData;
+        if (pageData.setu) {
+          pageData.setu.forEach(item => {
+            if (!allSetuItems.some(x => x.file === item.file)) allSetuItems.push(item);
+          });
+        }
+        if (pageData.zrsetu) {
+          pageData.zrsetu.forEach(item => {
+            if (!allZrsetuItems.some(x => x.file === item.file)) allZrsetuItems.push(item);
+          });
+        }
+      }
+    }
+  }
+  
+  listDiv.style.opacity = '1';
+  const currentPool = currentTab === 'setu' ? allSetuItems : allZrsetuItems;
+  
+  currentPool.sort((a, b) => {
+    const numA = parseInt(a.file.match(/\d+/)?.[0] || 0);
+    const numB = parseInt(b.file.match(/\d+/)?.[0] || 0);
+    return numB - numA;
   });
-
-  pagination.innerHTML = '';
-  if (totalPages <= 1) return;
-
-  const prev = document.createElement('button');
-  prev.textContent = '←';
-  prev.disabled = currentPage === 1;
-  prev.onclick = () => currentPage > 1 && switchPage(currentPage - 1, containerId);
-  pagination.appendChild(prev);
-
-  const maxBtns = 5;
-  let startPage = Math.max(1, currentPage - 2);
-  let endPage = Math.min(totalPages, startPage + maxBtns - 1);
-  if (endPage - startPage + 1 < maxBtns) startPage = Math.max(1, endPage - maxBtns + 1);
   
-  for (let i = startPage; i <= endPage; i++) {
-    const btn = document.createElement('button');
-    btn.textContent = i;
-    if (i === currentPage) btn.classList.add('active');
-    btn.onclick = () => switchPage(i, containerId);
-    pagination.appendChild(btn);
+  const pageItems = currentPool.slice(startIdx, endIdx);
+  
+  if (pageItems.length === 0) {
+    listDiv.innerHTML = `<div style="text-align:center;padding:40px;color:#9ca3af;font-weight:600;width:100%;">暂无当前页数据</div>`;
+  } else {
+    listDiv.innerHTML = pageItems.map(item => `
+      <li onclick="window.open('${rootUrl}${currentTab}/${item.file}', '_blank')">
+        <div class="item-left">
+          <div class="item-title">第 ${item.file.match(/\d+/)?.[0] || '?'} 期</div>
+          <div class="item-sub">${item.caption || '精选合集发布'}</div>
+        </div>
+        <div class="item-btn">点击阅读</div>
+      </li>
+    `).join('');
   }
+  
+  skeleton.style.display = 'none';
+  listDiv.style.display = 'flex';
+  
+  const listLi = listDiv.querySelectorAll('li');
+  listLi.forEach((li, idx) => {
+    setTimeout(() => li.classList.add('show'), idx * 20);
+  });
+  
+  document.getElementById('pageInfo').innerText = `${activePage} / ${totalPages}`;
+  
+  const prevBtn = document.getElementById('prevPageBtn');
+  if (activePage <= 1) prevBtn.classList.add('disabled');
+  else prevBtn.classList.remove('disabled');
+  
+  const nextBtn = document.getElementById('nextPageBtn');
+  if (activePage >= totalPages) nextBtn.classList.add('disabled');
+  else nextBtn.classList.remove('disabled');
+  
+  paginationCtrl.style.display = 'flex';
+}
 
-  const next = document.createElement('button');
-  next.textContent = '→';
-  next.disabled = currentPage === totalPages;
-  next.onclick = () => currentPage < totalPages && switchPage(currentPage + 1, containerId);
-  pagination.appendChild(next);
+function changePage(direction) {
+  const activePage = currentPage[currentTab];
+  const totalCount = currentTab === 'setu' ? totalSetuCount : totalZrsetuCount;
+  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE) || 1;
+  
+  const newPage = activePage + direction;
+  if (newPage < 1 || newPage > totalPages) return;
+  
+  currentPage[currentTab] = newPage;
+  renderCurrentList();
 }
 
 function toggleSearch(show) {
   const overlay = document.getElementById('searchOverlay');
   const input = document.getElementById('searchInput');
   if (show) {
-    overlay.style.display = 'flex';
-    setTimeout(() => overlay.classList.add('active'), 10);
-    input.focus();
-    if (allZrsetuItems.length === 0) {
-      fetchJson(`${rootUrl}data.json`).then(allData => {
-        const sortDesc = arr => arr.sort((a,b) => (parseInt(b.file)||0) - (parseInt(a.file)||0));
-        allZrsetuItems = sortDesc(allData.zrsetu || []);
-      });
-    }
+    overlay.classList.add('active');
+    setTimeout(() => input.focus(), 100);
   } else {
-    overlay.classList.add('closing');
-    setTimeout(() => {
-      overlay.classList.remove('active', 'closing');
-      overlay.style.display = 'none';
-      input.value = '';
-      document.getElementById('searchResults').innerHTML = '';
-    }, 110);
+    overlay.classList.remove('active');
+    input.value = '';
+    document.getElementById('searchResults').innerHTML = '';
   }
 }
 
-document.getElementById('searchInput').oninput = function(e) {
-  const val = e.target.value.toLowerCase().trim();
+async function preloadAllSearchData() {
+  let p = 2; 
+  while (true) {
+    if (!cachePages[p]) {
+      const data = await fetchJson(`${rootUrl}data_pages/${p}.json`);
+      if (!data) break;
+      cachePages[p] = data;
+      
+      if (data.setu) {
+        data.setu.forEach(item => {
+          if (!allSetuItems.some(x => x.file === item.file)) allSetuItems.push(item);
+        });
+      }
+      if (data.zrsetu) {
+        data.zrsetu.forEach(item => {
+          if (!allZrsetuItems.some(x => x.file === item.file)) allZrsetuItems.push(item);
+        });
+      }
+    }
+    p++;
+  }
+}
+
+function doSearch() {
+  const val = document.getElementById('searchInput').value.trim().toLowerCase();
   const resultsDiv = document.getElementById('searchResults');
+  
   if (!val) { resultsDiv.innerHTML = ''; return; }
-  const matched = allZrsetuItems.filter(item => item.caption && item.caption.toLowerCase().includes(val));
+  
+  const currentPool = currentTab === 'setu' ? allSetuItems : allZrsetuItems;
+  
+  const matched = currentPool.filter(item => {
+    const isCaptionMatch = item.caption && item.caption.toLowerCase().includes(val);
+    const issueNum = item.file.match(/\d+/)?.[0] || '';
+    const isNumMatch = issueNum && issueNum.includes(val);
+    return isCaptionMatch || isNumMatch;
+  });
+  
   resultsDiv.innerHTML = matched.map(item => `
-    <div class="item" onclick="window.open('${rootUrl}zrsetu/${item.file}', '_blank')">
-      <div class="title">第${item.file.match(/\d+/)?.[0] || '?'}期</div>
-      <div class="sub">${item.caption}</div>
+    <div class="item" onclick="window.open('${rootUrl}${currentTab}/${item.file}', '_blank')">
+      <div class="title">第 ${item.file.match(/\d+/)?.[0] || '?'} 期</div>
+      <div class="sub">${item.caption || '完整合集'}</div>
     </div>
   `).join('');
-};
+}
 
 window.onkeydown = (e) => {
   if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); toggleSearch(true); }
   if (e.key === 'Escape') toggleSearch(false);
 };
 
+function initTouchEvents() {
+  const tabSetu = document.getElementById('tab-setu');
+  const tabZrsetu = document.getElementById('tab-zrsetu');
+  
+  const bindEvent = (el, type, index) => {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      handleTabClick(type, index);
+    });
+  };
+  bindEvent(tabSetu, 'setu', 0);
+  bindEvent(tabZrsetu, 'zrsetu', 1);
+}
+
 async function startAppNow() {
+  initTouchEvents();
+  
   const firstPageData = await fetchJson(`${rootUrl}data_pages/1.json`);
+  if (!firstPageData) {
+    document.getElementById('skeleton').innerText = "数据加载失败，请刷新重试";
+    return;
+  }
   cachePages[1] = firstPageData;
   
   const getCount = arr => (arr && arr.length > 0) ? (parseInt(arr[0].file) || arr.length) : 0;
   totalSetuCount = getCount(firstPageData.setu);
   totalZrsetuCount = getCount(firstPageData.zrsetu);
   
-  const subsetSetu = (firstPageData.setu || []).slice(0, DISPLAY_PER_PAGE);
-  const subsetZrsetu = (firstPageData.zrsetu || []).slice(0, DISPLAY_PER_PAGE);
+  allSetuItems = (firstPageData.setu || []);
+  allZrsetuItems = (firstPageData.zrsetu || []);
   
-  renderListAndPagination(subsetSetu, totalSetuCount, 'setu-list', 'setu-pagination', 1);
-  renderListAndPagination(subsetZrsetu, totalZrsetuCount, 'zrsetu-list', 'zrsetu-pagination', 1);
-  
+  renderCurrentList();
   document.body.classList.add('loaded');
+  
+  preloadAllSearchData();
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', startAppNow);
-} else {
-  startAppNow();
-}
+document.addEventListener('DOMContentLoaded', startAppNow);
 </script>
 </body>
 </html>
