@@ -10,6 +10,7 @@
 <meta name="description" content="点击前往SetuTime~">
 <title>SetuTime！</title>
 <style>
+  /* 核心修复：将 html 和 body 背景色彻底拉齐，确保顶部安全区瞬间吃满颜色 */
   html, body {
     background: #428cca;
     margin: 0;
@@ -18,6 +19,7 @@
     transition: background 0.2s ease-in-out;
   }
   
+  /* 当处于粉色主题时，全域背景瞬间变粉 */
   html.pink-theme, body.pink-theme {
     background: #f8b8c8;
   }
@@ -30,9 +32,11 @@
     -webkit-font-smoothing: antialiased;
   }
 
+  /* 入场丝滑渐现动画 */
   header, .main-wrapper { opacity: 0; transform: translateY(15px); transition: opacity 0.5s ease-out, transform 0.5s ease-out; }
   .loaded header, .loaded .main-wrapper { opacity: 1; transform: translateY(0); }
   
+  /* 列表项独特的交错淡入与平滑阻尼动效 */
   ul.list li { opacity: 0; transform: translateY(10px); transition: opacity 0.35s ease-out, transform 0.35s cubic-bezier(0.2, 1, 0.2, 1); }
   .loaded ul.list li.show { opacity: 1; transform: translateY(0); }
   
@@ -51,8 +55,8 @@
 
   .container { max-width: 700px; margin: 0 auto; padding: 30px 20px 100px; box-sizing: border-box; }
   
-  /* 优化1：调淡了胶囊导航条的灰色背景 */
-  .tabs { display: flex; background: rgba(249,250,251,0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); padding: 5px; border-radius: 30px; margin-bottom: 25px; position: relative; border: 1px solid #f3f4f6; touch-action: manipulation; }
+  /* 高端胶囊切换条，注入微模糊 frosted glass 质感 */
+  .tabs { display: flex; background: rgba(243,244,246,0.86); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); padding: 5px; border-radius: 30px; margin-bottom: 25px; position: relative; border: 1px solid #e5e7eb; touch-action: manipulation; }
   .tab-item { flex: 1; text-align: center; padding: 12px 0; font-weight: 600; font-size: 15px; color: #4b5563; cursor: pointer; z-index: 2; transition: color 0.2s, transform 0.1s; border-radius: 25px; -webkit-tap-highlight-color: transparent; user-select: none; }
   .tab-item:active { transform: scale(0.96); opacity: 0.9; }
   .tab-item.active { color: #ffffff; }
@@ -66,6 +70,7 @@
   .item-left { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 0; text-align: left; padding-right: 12px; }
   .item-title { font-size: 16px; font-weight: 600; color: #111827; white-space: nowrap; }
   
+  /* 简介文本自动换行、展示全部，不截断 */
   .item-sub {
     font-size: 13px !important;
     color: #6b7280 !important;
@@ -79,35 +84,37 @@
   .item-btn { background: #f3f4f6; color: #4b5563; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; transition: all 0.25s; flex-shrink: 0; user-select: none; }
   ul.list li:hover .item-btn { background: #428cca; color: #ffffff; }
   
+  /* 现代波浪式渐变流光骨架屏加载动画 */
   .skeleton-list { display: flex; flex-direction: column; gap: 14px; min-height: 400px; }
-  .skeleton-item { height: 72px; background: linear-gradient(90deg, #f9fafb 25%, #e5e7eb 37%, #f9fafb 63%); background-size: 400% 100%; animation: skeleton-loading 1.4s ease infinite; border-radius: 18px; }
+  .skeleton-item { height: 72px; background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 37%, #f3f4f6 63%); background-size: 400% 100%; animation: skeleton-loading 1.4s ease infinite; border-radius: 18px; }
   @keyframes skeleton-loading { 0% { background-position: 100% 0 } 100% { background-position: 0 0 } }
   
+  /* 分页整体控制栏：精准限高，杜绝抖动 */
   .pagination-container { display: flex; align-items: center; justify-content: space-between; margin-top: 35px; gap: 10px; user-select: none; }
   .page-btn { flex: 1; max-width: 100px; text-align: center; padding: 11px 0; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 22px; color: #4b5563; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s; -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
   .page-btn:hover:not(.disabled) { border-color: #428cca; color: #428cca; background: rgba(66,140,202,0.02); }
   .page-btn:active:not(.disabled) { transform: scale(0.95); }
   .page-btn.disabled { color: #d1d5db; background: #f9fafb; border-color: #e5e7eb; cursor: not-allowed; transform: none; opacity: 0.6; }
 
-  /* 优化1：调淡了分页中心胶囊的外框背景色 */
+  /* 核心改良：极具果冻质感的高级独立胶囊页码跳转框 */
   .page-info-wrap { 
     display: flex; 
     align-items: center; 
     justify-content: center;
-    background: #f9fafb;
+    background: #f3f4f6;
     border: 1px solid #e5e7eb;
-    padding: 0 14px 0 16px;
+    padding: 0 16px;
     height: 40px;
     border-radius: 22px;
-    gap: 4px; 
+    gap: 6px; 
     font-size: 14px; 
     color: #6b7280; 
     font-weight: 600;
     box-sizing: border-box;
   }
-  
-  /* 优化2：升级改造为更加果冻感、操作极其便利的下拉选项框 */
-  .page-current-select { 
+  .page-current-input { 
+    width: 38px; 
+    height: 24px; 
     background: #ffffff; 
     border: 1px solid #d1d5db; 
     border-radius: 12px; 
@@ -116,32 +123,27 @@
     font-weight: 700; 
     color: #111827; 
     outline: none; 
-    height: 25px;
-    padding: 0 24px 0 8px;
-    cursor: pointer;
     transition: all 0.2s; 
     box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+    -moz-appearance: textfield; 
     box-sizing: border-box;
-    /* 优雅自定义小下拉箭头 */
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%234b5563' d='M0,0 L5,5 L10,0 Z'/></svg>");
-    background-repeat: no-repeat;
-    background-position: right 8px center;
+    padding: 0;
   }
-  .page-current-select:focus { border-color: #428cca; box-shadow: 0 0 0 2px rgba(66,140,202,0.15); }
+  .page-current-input::-webkit-outer-spin-button, .page-current-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .page-current-input:focus { border-color: #428cca; box-shadow: 0 0 0 2px rgba(66,140,202,0.15); }
   
+  /* 悬浮搜索触发按钮 */
   .search-trigger { position: fixed; bottom: 25px; right: 25px; width: 54px; height: 54px; background: #428cca; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(66,140,202,0.4); cursor: pointer; z-index: 99; transition: all 0.25s ease; -webkit-tap-highlight-color: transparent; }
   .search-trigger:hover { transform: scale(1.08) translateY(-2px); background: #53a3e6; box-shadow: 0 8px 24px rgba(66,140,202,0.5); }
   .search-trigger:active { transform: scale(0.95); }
   .search-trigger svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
   
+  /* 毛玻璃全屏搜索蒙层 */
   .search-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 1000; display: flex; flex-direction: column; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
   .search-overlay.active { opacity: 1; pointer-events: auto; }
   .search-header { padding: 20px; display: flex; align-items: center; max-width: 600px; width: 100%; margin: 0 auto; box-sizing: border-box; gap: 15px; }
   .search-input-wrap { position: relative; flex: 1; }
-  .search-input { width: 100%; height: 46px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 23px; padding: 0 20px 0 45px; font-size: 16px; color: #111827; outline: none; box-sizing: border-box; transition: all 0.25s; }
+  .search-input { width: 100%; height: 46px; background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 23px; padding: 0 20px 0 45px; font-size: 16px; color: #111827; outline: none; box-sizing: border-box; transition: all 0.25s; }
   .search-input:focus { background: #ffffff; border-color: #428cca; box-shadow: 0 0 0 3px rgba(66,140,202,0.15); }
   .search-icon-left { position: absolute; left: 18px; top: 13px; color: #9ca3af; }
   .search-icon-left svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.5; }
@@ -154,6 +156,7 @@
   .search-results .item .title { font-weight: 600; color: #111827; font-size: 15px; flex-shrink: 0; margin-right: 15px; }
   .search-results .item .sub { color: #6b7280 !important; font-size: 13px !important; line-height: 1.4 !important; white-space: normal !important; word-break: break-all !important; overflow: visible !important; flex: 1; text-align: right; }
   
+  /* Cosplay(zrsetu) 主题下的独有色彩印记映射 */
   html.pink-theme .tab-slider, body.pink-theme .tab-slider { background: #f8b8c8; box-shadow: 0 4px 12px rgba(248,184,200,0.35); }
   html.pink-theme ul.list li:hover, body.pink-theme ul.list li:hover { border-color: #f8b8c8; box-shadow: 0 6px 16px rgba(248,184,200,0.12); }
   html.pink-theme ul.list li:hover .item-btn, body.pink-theme ul.list li:hover .item-btn { background: #f8b8c8; color: #ffffff; }
@@ -162,12 +165,8 @@
   html.pink-theme .search-trigger:hover, body.pink-theme .search-trigger:hover { background: #fca1b7; box-shadow: 0 8px 24px rgba(248,184,200,0.6); }
   html.pink-theme .search-input:focus, body.pink-theme .search-input:focus { border-color: #f8b8c8; box-shadow: 0 0 0 3px rgba(248,184,200,0.15); }
   html.pink-theme .search-results .item:hover, body.pink-theme .search-results .item:hover { border-color: #f8b8c8; background: rgba(248,184,200,0.02); }
-  
-  /* 粉色主题下的选择框焦点态与自定义小箭头配色覆写 */
-  html.pink-theme .page-current-select:focus, body.pink-theme .page-current-select:focus { border-color: #f8b8c8; box-shadow: 0 0 0 2px rgba(248,184,200,0.15); }
-  html.pink-theme .page-current-select, body.pink-theme .page-current-select {
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%23f8b8c8' d='M0,0 L5,5 L10,0 Z'/></svg>");
-  }
+  /* 输入框焦点颜色粉色覆写 */
+  html.pink-theme .page-current-input:focus, body.pink-theme .page-current-input:focus { border-color: #f8b8c8; box-shadow: 0 0 0 2px rgba(248,184,200,0.15); }
 </style>
 </head>
 <body>
@@ -198,11 +197,8 @@
     <div class="pagination-container" id="paginationCtrl" style="display:none;">
       <div class="page-btn" id="prevPageBtn" onclick="changePage(-1)">上一页</div>
       
-      <!-- 极简通透下拉跳转胶囊组件 -->
       <div class="page-info-wrap">
-        <select class="page-current-select" id="pageCurrentSelect" onchange="handleSelectJump(this.value)">
-          <!-- 动态填充 -->
-        </select>
+        <input type="number" class="page-current-input" id="pageCurrentInput" min="1" value="1" onkeyup="if(event.keyCode===13)handleInputJump(this.value)" onblur="handleInputJump(this.value)">
         <span>/</span>
         <span id="pageTotalLabel">1</span>
       </div>
@@ -231,11 +227,7 @@
 
 <script>
 let currentTab = 'setu';
-// 页面首次启动时，优先从存储层读取当前分类刷新前的记忆页码，缺省默认为第1页
-let currentPage = { 
-  setu: parseInt(localStorage.getItem('setutime_page_setu')) || 1, 
-  zrsetu: parseInt(localStorage.getItem('setutime_page_zrsetu')) || 1 
-};
+let currentPage = { setu: 1, zrsetu: 1 };
 let cachePages = {}; 
 let allSetuItems = [];
 let allZrsetuItems = [];
@@ -413,15 +405,8 @@ async function renderCurrentList(isTabSwitch = false) {
     setTimeout(() => li.classList.add('show'), idx * 20);
   });
   
-  // 动态更新和组装下拉选项框
-  const selectEl = document.getElementById('pageCurrentSelect');
-  let selectHtml = '';
-  for(let i = 1; i <= totalPages; i++) {
-    selectHtml += `<option value="${i}"> ${i} </option>`;
-  }
-  selectEl.innerHTML = selectHtml;
-  selectEl.value = activePage;
-  
+  // 渲染跳转组合框内的参数
+  document.getElementById('pageCurrentInput').value = activePage;
   document.getElementById('pageTotalLabel').innerText = totalPages;
   
   const prevBtn = document.getElementById('prevPageBtn');
@@ -435,11 +420,25 @@ async function renderCurrentList(isTabSwitch = false) {
   paginationCtrl.style.display = 'flex';
 }
 
-/* 核心选择框变更直接跳转并保存机制 */
-function handleSelectJump(val) {
-  let pageNum = parseInt(val) || 1;
+/* 核心输入框跳转响应逻辑 */
+function handleInputJump(val) {
+  const totalCount = currentTab === 'setu' ? totalSetuCount : totalZrsetuCount;
+  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE) || 1;
+  let pageNum = parseInt(val);
+  
+  if (isNaN(pageNum)) {
+    document.getElementById('pageCurrentInput').value = currentPage[currentTab];
+    return;
+  }
+  if (pageNum < 1) pageNum = 1;
+  if (pageNum > totalPages) pageNum = totalPages;
+  
+  if (pageNum === currentPage[currentTab]) {
+    document.getElementById('pageCurrentInput').value = pageNum;
+    return;
+  }
+  
   currentPage[currentTab] = pageNum;
-  localStorage.setItem(`setutime_page_${currentTab}`, pageNum); // 持久化当前分类的最新页码
   renderCurrentList();
 }
 
@@ -452,7 +451,6 @@ function changePage(direction) {
   if (newPage < 1 || newPage > totalPages) return;
   
   currentPage[currentTab] = newPage;
-  localStorage.setItem(`setutime_page_${currentTab}`, newPage); // 同样在点击上一页/下一页时进行记忆保存
   renderCurrentList();
 }
 
@@ -553,12 +551,6 @@ async function startAppNow() {
   
   allSetuItems = (firstPageData.setu || []);
   allZrsetuItems = (firstPageData.zrsetu || []);
-  
-  // 边缘保护：确保从持久化拿回来的刷新前页码没有超出本次计算所得的总页数范围
-  const maxSetuPages = Math.ceil(totalSetuCount / ITEMS_PER_PAGE) || 1;
-  const maxZrsetuPages = Math.ceil(totalZrsetuCount / ITEMS_PER_PAGE) || 1;
-  if(currentPage.setu > maxSetuPages) currentPage.setu = maxSetuPages;
-  if(currentPage.zrsetu > maxZrsetuPages) currentPage.zrsetu = maxZrsetuPages;
   
   renderCurrentList();
   document.body.classList.add('loaded');
