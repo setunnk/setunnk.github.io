@@ -53,7 +53,8 @@
     position: relative;
   }
 
-  .container { max-width: 700px; margin: 0 auto; padding: 30px 20px 60px; box-sizing: border-box; }
+  /* 核心微调：将底部内边距从 60px 稍微加长到 90px，给下一页按钮提供安全空间，防悬浮球遮挡 */
+  .container { max-width: 700px; margin: 0 auto; padding: 30px 20px 90px; box-sizing: border-box; }
   
   /* 高端胶囊切换条，注入微模糊 frosted glass 质感 */
   .tabs { display: flex; background: rgba(243,244,246,0.86); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); padding: 5px; border-radius: 30px; margin-bottom: 25px; position: relative; border: 1px solid #e5e7eb; touch-action: manipulation; }
@@ -208,12 +209,10 @@ async function fetchJson(url) {
   }
 }
 
-// 核心功能：处理选项卡切换并加入 localStorage 记忆存储
 function handleTabClick(type, index) {
   if (currentTab === type) return;
   currentTab = type;
   
-  // 将最新的分类记录在浏览器缓存中
   localStorage.setItem('setutime_active_tab', type);
   
   document.getElementById('searchInput').value = '';
@@ -248,7 +247,6 @@ function handleTabClick(type, index) {
   renderCurrentList(true);
 }
 
-// 选项卡滑动块无动画平滑初始化（防止刷新时滑块满屏幕乱飞）
 function initTabSliderSilent(type) {
   const slider = document.getElementById('tabSlider');
   const items = document.querySelectorAll('.tab-item');
@@ -256,7 +254,6 @@ function initTabSliderSilent(type) {
   const subTitle = document.getElementById('sub-title');
   const metaTheme = document.getElementById('meta-theme-color');
   
-  // 暂时关闭过渡动画
   slider.style.transition = 'none';
   
   if (type === 'zrsetu') {
@@ -285,7 +282,6 @@ function initTabSliderSilent(type) {
     if(metaTheme) metaTheme.setAttribute('content', '#428cca');
   }
   
-  // 强制重绘后恢复丝滑滑动的过渡动画
   slider.offsetHeight; 
   slider.style.transition = 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), background 0.3s';
 }
@@ -301,10 +297,15 @@ async function renderCurrentList(isTabSwitch = false) {
     paginationCtrl.style.display = 'none';
   }
   
-  const activePage = currentPage[currentTab];
   const totalCount = currentTab === 'setu' ? totalSetuCount : totalZrsetuCount;
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE) || 1;
+
+  if (currentPage[currentTab] > totalPages) {
+    currentPage[currentTab] = 1;
+    localStorage.setItem(`setutime_page_${currentTab}`, 1);
+  }
   
+  const activePage = currentPage[currentTab];
   const startIdx = (activePage - 1) * ITEMS_PER_PAGE;
   const endIdx = activePage * ITEMS_PER_PAGE;
   
@@ -347,7 +348,6 @@ async function renderCurrentList(isTabSwitch = false) {
   if (pageItems.length === 0) {
     listDiv.innerHTML = `<div style="text-align:center;padding:40px;color:#9ca3af;font-weight:600;width:100%;">暂无当前页数据</div>`;
   } else {
-    // 核心更改：将原来的 window.open(..., '_blank') 改为 window.open(..., '_self') 实现原页面跳转
     listDiv.innerHTML = pageItems.map(item => `
       <li onclick="window.open('${rootUrl}${currentTab}/${item.file}', '_self')">
         <div class="item-left">
@@ -389,6 +389,7 @@ function changePage(direction) {
   if (newPage < 1 || newPage > totalPages) return;
   
   currentPage[currentTab] = newPage;
+  localStorage.setItem(`setutime_page_${currentTab}`, newPage);
   renderCurrentList();
 }
 
@@ -443,7 +444,6 @@ function doSearch() {
     return isCaptionMatch || isNumMatch;
   });
   
-  // 核心更改：将搜索结果列表的 window.open(..., '_blank') 同样改为 window.open(..., '_self') 原窗口直接覆盖跳转
   resultsDiv.innerHTML = matched.map(item => `
     <div class="item" onclick="window.open('${rootUrl}${currentTab}/${item.file}', '_self')">
       <div class="title">第 ${item.file.match(/\d+/)?.[0] || '?'} 期</div>
@@ -474,9 +474,13 @@ function initTouchEvents() {
 async function startAppNow() {
   initTouchEvents();
   
-  // 第一步：从本地缓存优先读取并悄悄恢复上一次点击的选项卡分类
   const savedTab = localStorage.getItem('setutime_active_tab') || 'setu';
   initTabSliderSilent(savedTab);
+
+  const savedSetuPage = localStorage.getItem('setutime_page_setu');
+  const savedZrsetuPage = localStorage.getItem('setutime_page_zrsetu');
+  if (savedSetuPage) currentPage.setu = parseInt(savedSetuPage) || 1;
+  if (savedZrsetuPage) currentPage.zrsetu = parseInt(savedZrsetuPage) || 1;
   
   const firstPageData = await fetchJson(`${rootUrl}data_pages/1.json`);
   if (!firstPageData) {
@@ -492,7 +496,6 @@ async function startAppNow() {
   allSetuItems = (firstPageData.setu || []);
   allZrsetuItems = (firstPageData.zrsetu || []);
   
-  // 依据已记忆恢复的选项卡加载正确的数据列表
   renderCurrentList();
   document.body.classList.add('loaded');
   
