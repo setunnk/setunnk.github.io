@@ -10,25 +10,30 @@
 <meta name="description" content="点击前往SetuTime~">
 <title>SetuTime！</title>
 <style>
-  /* 基础全局样式 */
-  html, body {
+  /* 核心修复：把网页最底层的容器底色死死锁成纯白色，彻底消灭底部黑条区域的蓝色残留 */
+  html {
+    background: #ffffff !important;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+  }
+
+  /* 基础全局样式 - 还原上一版，不做任何改动 */
+  body {
     background: #428cca;
     margin: 0;
     padding: 0;
     min-height: 100vh;
     transition: background 0.2s ease-in-out;
-  }
-  
-  html.pink-theme, body.pink-theme {
-    background: #f8b8c8;
-  }
-
-  body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     color: #374151;
     font-size: 15px;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
+  }
+  
+  body.pink-theme {
+    background: #f8b8c8;
   }
 
   header, .main-wrapper { opacity: 0; transform: translateY(15px); transition: opacity 0.5s ease-out, transform 0.5s ease-out; }
@@ -89,7 +94,7 @@
   .page-btn.disabled { color: #d1d5db; background: #f9fafb; border-color: #e5e7eb; cursor: not-allowed; transform: none; opacity: 0.6; }
   .page-info { font-size: 14px; color: #6b7280; font-weight: 600; }
   
-  /* 核心优化：仅向下延展 80px，刚好填满回弹和底部刘海屏安全区，拒绝多余空白 */
+  /* 辅助延伸 80px，保证常规内容滑到底时有白色厚度支撑 */
   .main-wrapper::after {
     content: "";
     position: absolute;
@@ -123,14 +128,14 @@
   .search-results .item .title { font-weight: 600; color: #111827; font-size: 15px; flex-shrink: 0; margin-right: 15px; }
   .search-results .item .sub { color: #6b7280 !important; font-size: 13px !important; line-height: 1.4 !important; white-space: normal !important; word-break: break-all !important; overflow: visible !important; flex: 1; text-align: right; }
   
-  html.pink-theme .tab-slider, body.pink-theme .tab-slider { background: #f8b8c8; box-shadow: 0 4px 12px rgba(248,184,200,0.35); }
-  html.pink-theme ul.list li:hover, body.pink-theme ul.list li:hover { border-color: #f8b8c8; box-shadow: 0 6px 16px rgba(248,184,200,0.12); }
-  html.pink-theme ul.list li:hover .item-btn, body.pink-theme ul.list li:hover .item-btn { background: #f8b8c8; color: #ffffff; }
-  html.pink-theme .page-btn:hover:not(.disabled), body.pink-theme .page-btn:hover:not(.disabled) { border-color: #f8b8c8; color: #f8b8c8; background: rgba(248,184,200,0.03); }
-  html.pink-theme .search-trigger, body.pink-theme .search-trigger { background: #f8b8c8; box-shadow: 0 6px 20px rgba(248,184,200,0.5); }
-  html.pink-theme .search-trigger:hover, body.pink-theme .search-trigger:hover { background: #fca1b7; box-shadow: 0 8px 24px rgba(248,184,200,0.6); }
-  html.pink-theme .search-input:focus, body.pink-theme .search-input:focus { border-color: #f8b8c8; box-shadow: 0 0 0 3px rgba(248,184,200,0.15); }
-  html.pink-theme .search-results .item:hover, body.pink-theme .search-results .item:hover { border-color: #f8b8c8; background: rgba(248,184,200,0.02); }
+  body.pink-theme .tab-slider { background: #f8b8c8; box-shadow: 0 4px 12px rgba(248,184,200,0.35); }
+  body.pink-theme ul.list li:hover { border-color: #f8b8c8; box-shadow: 0 6px 16px rgba(248,184,200,0.12); }
+  body.pink-theme ul.list li:hover .item-btn { background: #f8b8c8; color: #ffffff; }
+  body.pink-theme .page-btn:hover:not(.disabled) { border-color: #f8b8c8; color: #f8b8c8; background: rgba(248,184,200,0.03); }
+  body.pink-theme .search-trigger { background: #f8b8c8; box-shadow: 0 6px 20px rgba(248,184,200,0.5); }
+  body.pink-theme .search-trigger:hover { background: #fca1b7; box-shadow: 0 8px 24px rgba(248,184,200,0.6); }
+  body.pink-theme .search-input:focus { border-color: #f8b8c8; box-shadow: 0 0 0 3px rgba(248,184,200,0.15); }
+  body.pink-theme .search-results .item:hover { border-color: #f8b8c8; background: rgba(248,184,200,0.02); }
 </style>
 </head>
 <body>
@@ -228,14 +233,12 @@ function handleTabClick(type, index) {
   const metaTheme = document.getElementById('meta-theme-color');
   
   if (type === 'zrsetu') {
-    document.documentElement.classList.add('pink-theme');
     document.body.classList.add('pink-theme');
     mainTitle.innerText = "SetuTime！";
     subTitle.innerText = "Cosplayエッチ画像まとめ";
     slider.style.background = '#f8b8c8';
     if(metaTheme) metaTheme.setAttribute('content', '#f8b8c8');
   } else {
-    document.documentElement.classList.remove('pink-theme');
     document.body.classList.remove('pink-theme');
     mainTitle.innerText = "SetuTime！";
     subTitle.innerText = "ACGエッチ画像まとめ";
