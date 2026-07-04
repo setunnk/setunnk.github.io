@@ -32,8 +32,11 @@
     -webkit-font-smoothing: antialiased;
   }
 
+  /* 入场丝滑渐现动画 */
   header, .main-wrapper { opacity: 0; transform: translateY(15px); transition: opacity 0.5s ease-out, transform 0.5s ease-out; }
   .loaded header, .loaded .main-wrapper { opacity: 1; transform: translateY(0); }
+  
+  /* 列表项独特的交错淡入与平滑阻尼动效 */
   ul.list li { opacity: 0; transform: translateY(10px); transition: opacity 0.35s ease-out, transform 0.35s cubic-bezier(0.2, 1, 0.2, 1); }
   .loaded ul.list li.show { opacity: 1; transform: translateY(0); }
   
@@ -47,10 +50,12 @@
     margin-top: 10px;
     min-height: calc(100vh - 150px);
     box-shadow: 0 -10px 30px rgba(0,0,0,0.05);
+    position: relative;
   }
 
-  .container { max-width: 700px; margin: 0 auto; padding: 30px 20px 100px; box-sizing: border-box; }
+  .container { max-width: 700px; margin: 0 auto; padding: 30px 20px 60px; box-sizing: border-box; }
   
+  /* 高端胶囊切换条，注入微模糊 frosted glass 质感 */
   .tabs { display: flex; background: rgba(243,244,246,0.86); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); padding: 5px; border-radius: 30px; margin-bottom: 25px; position: relative; border: 1px solid #e5e7eb; touch-action: manipulation; }
   .tab-item { flex: 1; text-align: center; padding: 12px 0; font-weight: 600; font-size: 15px; color: #4b5563; cursor: pointer; z-index: 2; transition: color 0.2s, transform 0.1s; border-radius: 25px; -webkit-tap-highlight-color: transparent; user-select: none; }
   .tab-item:active { transform: scale(0.96); opacity: 0.9; }
@@ -65,7 +70,7 @@
   .item-left { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 0; text-align: left; padding-right: 12px; }
   .item-title { font-size: 16px; font-weight: 600; color: #111827; white-space: nowrap; }
   
-  /* 核心修复 2：使用标准且最高优先级的强制换行控制，彻底击碎省略号截断 */
+  /* 核心修复 2：彻底打破原组件限制，强制简介文本自动换行、展示全部，不截断 */
   .item-sub {
     font-size: 13px !important;
     color: #6b7280 !important;
@@ -79,6 +84,7 @@
   .item-btn { background: #f3f4f6; color: #4b5563; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; transition: all 0.25s; flex-shrink: 0; user-select: none; }
   ul.list li:hover .item-btn { background: #428cca; color: #ffffff; }
   
+  /* 现代波浪式渐变流光骨架屏加载动画 */
   .skeleton-list { display: flex; flex-direction: column; gap: 14px; }
   .skeleton-item { height: 72px; background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 37%, #f3f4f6 63%); background-size: 400% 100%; animation: skeleton-loading 1.4s ease infinite; border-radius: 18px; }
   @keyframes skeleton-loading { 0% { background-position: 100% 0 } 100% { background-position: 0 0 } }
@@ -90,11 +96,13 @@
   .page-btn.disabled { color: #d1d5db; background: #f9fafb; border-color: #e5e7eb; cursor: not-allowed; transform: none; opacity: 0.6; }
   .page-info { font-size: 14px; color: #6b7280; font-weight: 600; }
   
+  /* 悬浮搜索触发按钮 */
   .search-trigger { position: fixed; bottom: 25px; right: 25px; width: 54px; height: 54px; background: #428cca; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(66,140,202,0.4); cursor: pointer; z-index: 99; transition: all 0.25s ease; -webkit-tap-highlight-color: transparent; }
   .search-trigger:hover { transform: scale(1.08) translateY(-2px); background: #53a3e6; box-shadow: 0 8px 24px rgba(66,140,202,0.5); }
   .search-trigger:active { transform: scale(0.95); }
   .search-trigger svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
   
+  /* 毛玻璃全屏搜索蒙层 */
   .search-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 1000; display: flex; flex-direction: column; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
   .search-overlay.active { opacity: 1; pointer-events: auto; }
   .search-header { padding: 20px; display: flex; align-items: center; max-width: 600px; width: 100%; margin: 0 auto; box-sizing: border-box; gap: 15px; }
@@ -103,26 +111,16 @@
   .search-input:focus { background: #ffffff; border-color: #428cca; box-shadow: 0 0 0 3px rgba(66,140,202,0.15); }
   .search-icon-left { position: absolute; left: 18px; top: 13px; color: #9ca3af; }
   .search-icon-left svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.5; }
-  .search-close { font-size: 15px; color: #6b7280; cursor: pointer; font-weight: 600; padding: 5px 10px;-webkit-tap-highlight-color: transparent; user-select: none; }
+  .search-close { font-size: 15px; color: #6b7280; cursor: pointer; font-weight: 600; padding: 5px 10px; -webkit-tap-highlight-color: transparent; user-select: none; }
   .search-close:hover { color: #111827; }
   
   .search-results { flex: 1; overflow-y: auto; max-width: 600px; width: 100%; margin: 0 auto; padding: 10px 20px 40px; box-sizing: border-box; }
   .search-results .item { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 16px; padding: 14px 18px; margin-bottom: 12px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: all 0.2s; }
   .search-results .item:hover { border-color: #428cca; background: rgba(66,140,202,0.01); transform: translateY(-1px); }
   .search-results .item .title { font-weight: 600; color: #111827; font-size: 15px; flex-shrink: 0; margin-right: 15px; }
+  .search-results .item .sub { color: #6b7280 !important; font-size: 13px !important; line-height: 1.4 !important; white-space: normal !important; word-break: break-all !important; overflow: visible !important; flex: 1; text-align: right; }
   
-  .search-results .item .sub {
-    color: #6b7280 !important;
-    font-size: 13px !important;
-    line-height: 1.4 !important;
-    white-space: normal !important;
-    word-break: break-all !important;
-    overflow: visible !important;
-    flex: 1;
-    text-align: right;
-  }
-  
-  /* 粉色调全局主题激活动态样式 */
+  /* 专属定制：Cosplay(zrsetu) 主题下的独有色彩印记映射 */
   html.pink-theme .tab-slider, body.pink-theme .tab-slider { background: #f8b8c8; box-shadow: 0 4px 12px rgba(248,184,200,0.35); }
   html.pink-theme ul.list li:hover, body.pink-theme ul.list li:hover { border-color: #f8b8c8; box-shadow: 0 6px 16px rgba(248,184,200,0.12); }
   html.pink-theme ul.list li:hover .item-btn, body.pink-theme ul.list li:hover .item-btn { background: #f8b8c8; color: #ffffff; }
@@ -210,10 +208,13 @@ async function fetchJson(url) {
   }
 }
 
-// 核心重构函数：在点击的第 1 毫秒优先同步根节点类名，杜绝变色延迟
+// 核心功能：处理选项卡切换并加入 localStorage 记忆存储
 function handleTabClick(type, index) {
   if (currentTab === type) return;
   currentTab = type;
+  
+  // 将最新的分类记录在浏览器缓存中
+  localStorage.setItem('setutime_active_tab', type);
   
   document.getElementById('searchInput').value = '';
   document.getElementById('searchResults').innerHTML = '';
@@ -228,7 +229,6 @@ function handleTabClick(type, index) {
   const subTitle = document.getElementById('sub-title');
   const metaTheme = document.getElementById('meta-theme-color');
   
-  // 核心：优先控制 html 和 body 的 ClassList，使得沉浸式顶部无视加载直接变色
   if (type === 'zrsetu') {
     document.documentElement.classList.add('pink-theme');
     document.body.classList.add('pink-theme');
@@ -246,6 +246,48 @@ function handleTabClick(type, index) {
   }
   
   renderCurrentList(true);
+}
+
+// 选项卡滑动块无动画平滑初始化（防止刷新时滑块满屏幕乱飞）
+function initTabSliderSilent(type) {
+  const slider = document.getElementById('tabSlider');
+  const items = document.querySelectorAll('.tab-item');
+  const mainTitle = document.getElementById('main-title');
+  const subTitle = document.getElementById('sub-title');
+  const metaTheme = document.getElementById('meta-theme-color');
+  
+  // 暂时关闭过渡动画
+  slider.style.transition = 'none';
+  
+  if (type === 'zrsetu') {
+    currentTab = 'zrsetu';
+    localStorage.setItem('setutime_active_tab', 'zrsetu');
+    slider.style.transform = 'translateX(100%)';
+    items[0].classList.remove('active');
+    items[1].classList.add('active');
+    document.documentElement.classList.add('pink-theme');
+    document.body.classList.add('pink-theme');
+    mainTitle.innerText = "SetuTime！";
+    subTitle.innerText = "Cosplayエッチ画像まとめ";
+    slider.style.background = '#f8b8c8';
+    if(metaTheme) metaTheme.setAttribute('content', '#f8b8c8');
+  } else {
+    currentTab = 'setu';
+    localStorage.setItem('setutime_active_tab', 'setu');
+    slider.style.transform = 'translateX(0%)';
+    items[1].classList.remove('active');
+    items[0].classList.add('active');
+    document.documentElement.classList.remove('pink-theme');
+    document.body.classList.remove('pink-theme');
+    mainTitle.innerText = "SetuTime！";
+    subTitle.innerText = "ACGエッチ画像まとめ";
+    slider.style.background = '#428cca';
+    if(metaTheme) metaTheme.setAttribute('content', '#428cca');
+  }
+  
+  // 强制重绘后恢复丝滑滑动的过渡动画
+  slider.offsetHeight; 
+  slider.style.transition = 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), background 0.3s';
 }
 
 async function renderCurrentList(isTabSwitch = false) {
@@ -305,8 +347,9 @@ async function renderCurrentList(isTabSwitch = false) {
   if (pageItems.length === 0) {
     listDiv.innerHTML = `<div style="text-align:center;padding:40px;color:#9ca3af;font-weight:600;width:100%;">暂无当前页数据</div>`;
   } else {
+    // 核心更改：将原来的 window.open(..., '_blank') 改为 window.open(..., '_self') 实现原页面跳转
     listDiv.innerHTML = pageItems.map(item => `
-      <li onclick="window.open('${rootUrl}${currentTab}/${item.file}', '_blank')">
+      <li onclick="window.open('${rootUrl}${currentTab}/${item.file}', '_self')">
         <div class="item-left">
           <div class="item-title">第 ${item.file.match(/\d+/)?.[0] || '?'} 期</div>
           <div class="item-sub">${item.caption || '精选合集发布'}</div>
@@ -400,8 +443,9 @@ function doSearch() {
     return isCaptionMatch || isNumMatch;
   });
   
+  // 核心更改：将搜索结果列表的 window.open(..., '_blank') 同样改为 window.open(..., '_self') 原窗口直接覆盖跳转
   resultsDiv.innerHTML = matched.map(item => `
-    <div class="item" onclick="window.open('${rootUrl}${currentTab}/${item.file}', '_blank')">
+    <div class="item" onclick="window.open('${rootUrl}${currentTab}/${item.file}', '_self')">
       <div class="title">第 ${item.file.match(/\d+/)?.[0] || '?'} 期</div>
       <div class="sub">${item.caption || '完整合集'}</div>
     </div>
@@ -430,6 +474,10 @@ function initTouchEvents() {
 async function startAppNow() {
   initTouchEvents();
   
+  // 第一步：从本地缓存优先读取并悄悄恢复上一次点击的选项卡分类
+  const savedTab = localStorage.getItem('setutime_active_tab') || 'setu';
+  initTabSliderSilent(savedTab);
+  
   const firstPageData = await fetchJson(`${rootUrl}data_pages/1.json`);
   if (!firstPageData) {
     document.getElementById('skeleton').innerText = "数据加载失败，请刷新重试";
@@ -444,6 +492,7 @@ async function startAppNow() {
   allSetuItems = (firstPageData.setu || []);
   allZrsetuItems = (firstPageData.zrsetu || []);
   
+  // 依据已记忆恢复的选项卡加载正确的数据列表
   renderCurrentList();
   document.body.classList.add('loaded');
   
