@@ -16,10 +16,10 @@ concurrency:
   cancel-in-progress: true 
 
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  # ----------------------------------------------------
+  # 任务 1：负责拉取代码、编译、运行脚本生成数据、打包产物
+  # ----------------------------------------------------
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: 1. 拉取最新代码
@@ -81,7 +81,7 @@ jobs:
           const zrsetuItems = scanDir('zrsetu');
           const updatedTime = new Date().toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'}).replace(/\//g,'-');
 
-          // 2. 保留原始全量 data.json 用于全局检索
+          // 保留原始全量 data.json 用于全局检索
           const allData = {
             updated: updatedTime,
             setu: setuItems,
@@ -89,7 +89,7 @@ jobs:
           };
           fs.writeFileSync('data.json', JSON.stringify(allData, null, 2));
 
-          // 3. 将后台大包按 50 条数据进行动态切分
+          // 将后台大包按 50 条数据进行动态切分
           const PAGESIZE = 50;
           const pageDir = path.join(__dirname, 'data_pages');
           if (!fs.existsSync(pageDir)) {
@@ -112,13 +112,23 @@ jobs:
           node generate.js
 
       - name: 4. 准备托管配置
-        uses: actions/configure-pages@v4
+        uses: actions/configure-pages@v5
 
-      - name: 5. 统一打包（此时包里已经包含了刚才热腾腾生成的新 1.json 和 data.json）
+      - name: 5. 统一打包并上传产物（生成名为 github-pages 的打包件）
         uses: actions/upload-pages-artifact@v3
         with:
           path: ${{ github.workspace }}
 
+  # ----------------------------------------------------
+  # 任务 2：负责把打包好的产物正式发布到 GitHub Pages
+  # ----------------------------------------------------
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build # 关键：确保必须等上面的 build 任务成功完成后才执行部署
+    steps:
       - name: 6. 正式发布到 GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
