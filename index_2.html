@@ -13,7 +13,7 @@
   body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:#ffffff;color:#374151;min-height:100vh;font-size:15px;overflow-x:hidden;-webkit-font-smoothing:antialiased}
   header, .container {opacity: 0;transform: translateY(15px);transition: opacity 0.5s ease-out, transform 0.5s ease-out}
   .loaded header, .loaded .container {opacity: 1;transform: translateY(0)}
-  ul.list li {opacity: 0;transform: translateY(15px);transition: opacity 0.4s ease-out, transform 0.4s cubic-bezier(0.2, 1, 0.2, 1)}
+  ul.list li {opacity: 0;transform: translateY(10px);transition: opacity 0.35s ease-out, transform 0.35s cubic-bezier(0.2, 1, 0.2, 1)}
   .loaded ul.list li.show {opacity: 1;transform: translateY(0)}
   
   header{background:linear-gradient(135deg,#428cca,#53a3e6);color:#ffffff;padding:40px 20px;text-align:center;box-shadow:0 4px 20px rgba(66,140,202,0.15);position:relative}
@@ -22,10 +22,10 @@
   
   .container{max-width:700px;margin:30px auto;padding:0 20px;box-sizing:border-box;padding-bottom:100px}
   
-  /* 导航 Tab 样式：胶囊形态 */
-  .tabs{display:flex;background:#f3f4f6;padding:5px;border-radius:30px;margin-bottom:25px;position:relative;border:1px solid #e5e7eb;touch-action:manipulation}
+  /* 导航 Tab 样式：胶囊形态加毛玻璃微特效 */
+  .tabs{display:flex;background:rgba(243,244,246,0.86);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:5px;border-radius:30px;margin-bottom:25px;position:relative;border:1px solid #e5e7eb;touch-action:manipulation}
   .tab-item{flex:1;text-align:center;padding:12px 0;font-weight:600;font-size:15px;color:#4b5563;cursor:pointer;z-index:2;transition:color 0.2s, transform 0.1s;border-radius:25px;-webkit-tap-highlight-color:transparent;user-select:none}
-  .tab-item:active{transform:scale(0.95);opacity:0.85}
+  .tab-item:active{transform:scale(0.96);opacity:0.9}
   .tab-item.active{color:#ffffff}
   .tab-slider{position:absolute;top:5px;left:5px;width:calc(50% - 5px);height:calc(100% - 10px);background:#428cca;border-radius:25px;z-index:1;transition:transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), background 0.3s;box-shadow:0 4px 12px rgba(66,140,202,0.25)}
   
@@ -47,7 +47,7 @@
   .skeleton-item{height:72px;background:linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 37%, #f3f4f6 63%);background-size:400% 100%;animation:skeleton-loading 1.4s ease infinite;border-radius:18px}
   @keyframes skeleton-loading{0%{background-position:100% 0}100%{background-position:0 0}}
   
-  /* 标准标准分页控制组件 */
+  /* 标准分页控制组件 */
   .pagination-container {display:flex;align-items:center;justify-content:space-between;margin-top:30px;gap:10px;user-select:none}
   .page-btn {flex:1;max-width:100px;text-align:center;padding:12px 0;background:#ffffff;border:1px solid #e5e7eb;border-radius:22px;color:#4b5563;font-weight:600;font-size:14px;cursor:pointer;transition:all 0.2s;-webkit-tap-highlight-color:transparent}
   .page-btn:hover:not(.disabled) {border-color:#428cca;color:#428cca;background:rgba(66,140,202,0.02)}
@@ -141,7 +141,6 @@
 
 <script>
 let currentTab = 'setu';
-// 记录当前 Tab 停留的具体页码
 let currentPage = { setu: 1, zrsetu: 1 };
 let cachePages = {}; 
 let allSetuItems = [];
@@ -149,12 +148,12 @@ let allZrsetuItems = [];
 let totalSetuCount = 0;
 let totalZrsetuCount = 0;
 
-// 固定单页展示 10 期
+// 前端展示配置：每页10期，服务端每个文件含有50条
 const ITEMS_PER_PAGE = 10;
+const SERVER_ITEMS_PER_FILE = 50;
 
 const rootUrl = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost' ? '/' : 'https://setutime.com/';
 
-// 带绝对时间戳的请求函数
 async function fetchJson(url) {
   try {
     const timestamp = new Date().getTime();
@@ -199,36 +198,40 @@ function handleTabClick(type, index) {
   renderCurrentList(true);
 }
 
-// 核心渲染函数：进行 10 期一页的数据切片与按需异步请求
+// 核心渲染：5页为一个后端数据源文件的动态按需加载算法
 async function renderCurrentList(isTabSwitch = false) {
   const listDiv = document.getElementById('contentList');
   const paginationCtrl = document.getElementById('paginationCtrl');
   const skeleton = document.getElementById('skeleton');
   
-  listDiv.style.display = 'none';
-  skeleton.style.display = 'flex';
-  paginationCtrl.style.display = 'none';
+  // 只有在切换 Tab 时才展示大骨架屏，如果是同文件内无缝翻页则通过列表淡入优化，防止白屏闪烁
+  if (isTabSwitch) {
+    listDiv.style.display = 'none';
+    skeleton.style.display = 'flex';
+    paginationCtrl.style.display = 'none';
+  }
   
   const activePage = currentPage[currentTab];
   const totalCount = currentTab === 'setu' ? totalSetuCount : totalZrsetuCount;
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE) || 1;
   
-  // 计算当前页所对应数据的起始索引和结束索引范围
   const startIdx = (activePage - 1) * ITEMS_PER_PAGE;
   const endIdx = activePage * ITEMS_PER_PAGE;
   
-  // 核心优化：动态推算当前页码所需的数据在哪些服务端的 json 分页文件中
-  // 原服务端 json 结构一个文件包揽 100 期（假设 1.json 包含 1~100 项）
-  const neededFileIndexStart = Math.floor(startIdx / 100) + 1;
-  const neededFileIndexEnd = Math.floor((endIdx - 1) / 100) + 1;
+  // 根据 10期/页 和 50条/文件，精准计算出本页数据落在服务端的哪个 JSON 文件内
+  const neededFileIndexStart = Math.floor(startIdx / SERVER_ITEMS_PER_FILE) + 1;
+  const neededFileIndexEnd = Math.floor((endIdx - 1) / SERVER_ITEMS_PER_FILE) + 1;
   
-  // 按需加载未命中的服务端原始数据文件
+  // 如内存大池中无数据，则按需异步获取对应的 JSON 文件
   for (let p = neededFileIndexStart; p <= neededFileIndexEnd; p++) {
     if (!cachePages[p]) {
+      // 只有在缺失数据时显示骨架屏
+      if (listDiv.style.display !== 'none') {
+        listDiv.style.opacity = '0.4';
+      }
       const pageData = await fetchJson(`${rootUrl}data_pages/${p}.json`);
       if (pageData) {
         cachePages[p] = pageData;
-        // 合并进大池子，去重处理
         if (pageData.setu) {
           pageData.setu.forEach(item => {
             if (!allSetuItems.some(x => x.file === item.file)) allSetuItems.push(item);
@@ -243,19 +246,20 @@ async function renderCurrentList(isTabSwitch = false) {
     }
   }
   
+  listDiv.style.opacity = '1';
   const currentPool = currentTab === 'setu' ? allSetuItems : allZrsetuItems;
-  // 对前端大池子重新进行严格降序排序
+  
+  // 按照期号数字降序排序
   currentPool.sort((a, b) => {
     const numA = parseInt(a.file.match(/\d+/)?.[0] || 0);
     const numB = parseInt(b.file.match(/\d+/)?.[0] || 0);
     return numB - numA;
   });
   
-  // 获取当前页的 10 条精选切片数据
   const pageItems = currentPool.slice(startIdx, endIdx);
   
   if (pageItems.length === 0) {
-    listDiv.innerHTML = `<div style="text-align:center;padding:40px;color:#9ca3af;font-weight:600;width:100%;">暂无此页数据</div>`;
+    listDiv.innerHTML = `<div style="text-align:center;padding:40px;color:#9ca3af;font-weight:600;width:100%;">暂无当前页数据</div>`;
   } else {
     listDiv.innerHTML = pageItems.map(item => `
       <li onclick="window.open('${rootUrl}${currentTab}/${item.file}', '_blank')">
@@ -271,35 +275,24 @@ async function renderCurrentList(isTabSwitch = false) {
   skeleton.style.display = 'none';
   listDiv.style.display = 'flex';
   
-  // 动效平滑级联加载
+  // 极其平滑的瀑布阶梯式展现动效
   const listLi = listDiv.querySelectorAll('li');
   listLi.forEach((li, idx) => {
-    setTimeout(() => li.classList.add('show'), idx * 25);
+    setTimeout(() => li.classList.add('show'), idx * 20);
   });
   
-  // 更新分页器显示状态
+  // 刷新前端控制器的页码文本
   document.getElementById('pageInfo').innerText = `${activePage} / ${totalPages}`;
   
   const prevBtn = document.getElementById('prevPageBtn');
-  if (activePage <= 1) {
-    prevBtn.classList.add('disabled');
-  } else {
-    prevBtn.classList.remove('disabled');
-  }
+  if (activePage <= 1) prevBtn.classList.add('disabled');
+  else prevBtn.classList.remove('disabled');
   
   const nextBtn = document.getElementById('nextPageBtn');
-  if (activePage >= totalPages) {
-    nextBtn.classList.add('disabled');
-  } else {
-    nextBtn.classList.remove('disabled');
-  }
+  if (activePage >= totalPages) nextBtn.classList.add('disabled');
+  else nextBtn.classList.remove('disabled');
   
   paginationCtrl.style.display = 'flex';
-  
-  // 切换页码或分类时，平滑滚动回到顶部，优化体验
-  if (!isTabSwitch) {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
 }
 
 function changePage(direction) {
@@ -327,7 +320,7 @@ function toggleSearch(show) {
   }
 }
 
-// 后台静默流式预加载所有检索池数据
+// 依然在后台静默预拉取剩余 JSON，确保全局模糊搜索的完整度
 async function preloadAllSearchData() {
   let p = 2; 
   while (true) {
@@ -379,22 +372,16 @@ window.onkeydown = (e) => {
   if (e.key === 'Escape') toggleSearch(false);
 };
 
-// 初始化移动端特化绑定（替代带有延迟的 onclick）
 function initTouchEvents() {
   const tabSetu = document.getElementById('tab-setu');
   const tabZrsetu = document.getElementById('tab-zrsetu');
   
   const bindEvent = (el, type, index) => {
-    el.addEventListener('touchstart', (e) => {
-      // 允许手势不被完全阻断
-    }, { passive: true });
-    
     el.addEventListener('click', (e) => {
       e.preventDefault();
       handleTabClick(type, index);
     });
   };
-  
   bindEvent(tabSetu, 'setu', 0);
   bindEvent(tabZrsetu, 'zrsetu', 1);
 }
@@ -413,7 +400,6 @@ async function startAppNow() {
   totalSetuCount = getCount(firstPageData.setu);
   totalZrsetuCount = getCount(firstPageData.zrsetu);
   
-  // 首次拉取数据装填进入内存大池子
   allSetuItems = (firstPageData.setu || []);
   allZrsetuItems = (firstPageData.zrsetu || []);
   
