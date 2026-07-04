@@ -94,8 +94,8 @@
 <body>
 
 <header>
-  <h1 id="main-title">涩图Time！</h1>
-  <p id="sub-title">二次元篇大合集</p>
+  <h1 id="main-title">SetuTime！</h1>
+  <p id="sub-title">ACGエッチ画像まとめ</p>
 </header>
 
 <div class="container">
@@ -148,7 +148,6 @@ let allZrsetuItems = [];
 let totalSetuCount = 0;
 let totalZrsetuCount = 0;
 
-// 前端展示配置：每页10期，服务端每个文件含有50条
 const ITEMS_PER_PAGE = 10;
 const SERVER_ITEMS_PER_FILE = 50;
 
@@ -185,26 +184,24 @@ function handleTabClick(type, index) {
   
   if (type === 'zrsetu') {
     document.body.classList.add('pink-theme');
-    mainTitle.innerText = "专属Time！";
-    subTitle.innerText = "cos篇大合集";
+    mainTitle.innerText = "SetuTime！";
+    subTitle.innerText = "Cosplayエッチ画像まとめ";
     slider.style.background = '#f8b8c8';
   } else {
     document.body.classList.remove('pink-theme');
-    mainTitle.innerText = "涩图Time！";
-    subTitle.innerText = "二次元篇大合集";
+    mainTitle.innerText = "SetuTime！";
+    subTitle.innerText = "ACGエッチ画像まとめ";
     slider.style.background = '#428cca';
   }
   
   renderCurrentList(true);
 }
 
-// 核心渲染：5页为一个后端数据源文件的动态按需加载算法
 async function renderCurrentList(isTabSwitch = false) {
   const listDiv = document.getElementById('contentList');
   const paginationCtrl = document.getElementById('paginationCtrl');
   const skeleton = document.getElementById('skeleton');
   
-  // 只有在切换 Tab 时才展示大骨架屏，如果是同文件内无缝翻页则通过列表淡入优化，防止白屏闪烁
   if (isTabSwitch) {
     listDiv.style.display = 'none';
     skeleton.style.display = 'flex';
@@ -218,14 +215,11 @@ async function renderCurrentList(isTabSwitch = false) {
   const startIdx = (activePage - 1) * ITEMS_PER_PAGE;
   const endIdx = activePage * ITEMS_PER_PAGE;
   
-  // 根据 10期/页 和 50条/文件，精准计算出本页数据落在服务端的哪个 JSON 文件内
   const neededFileIndexStart = Math.floor(startIdx / SERVER_ITEMS_PER_FILE) + 1;
   const neededFileIndexEnd = Math.floor((endIdx - 1) / SERVER_ITEMS_PER_FILE) + 1;
   
-  // 如内存大池中无数据，则按需异步获取对应的 JSON 文件
   for (let p = neededFileIndexStart; p <= neededFileIndexEnd; p++) {
     if (!cachePages[p]) {
-      // 只有在缺失数据时显示骨架屏
       if (listDiv.style.display !== 'none') {
         listDiv.style.opacity = '0.4';
       }
@@ -249,7 +243,6 @@ async function renderCurrentList(isTabSwitch = false) {
   listDiv.style.opacity = '1';
   const currentPool = currentTab === 'setu' ? allSetuItems : allZrsetuItems;
   
-  // 按照期号数字降序排序
   currentPool.sort((a, b) => {
     const numA = parseInt(a.file.match(/\d+/)?.[0] || 0);
     const numB = parseInt(b.file.match(/\d+/)?.[0] || 0);
@@ -275,13 +268,11 @@ async function renderCurrentList(isTabSwitch = false) {
   skeleton.style.display = 'none';
   listDiv.style.display = 'flex';
   
-  // 极其平滑的瀑布阶梯式展现动效
   const listLi = listDiv.querySelectorAll('li');
   listLi.forEach((li, idx) => {
     setTimeout(() => li.classList.add('show'), idx * 20);
   });
   
-  // 刷新前端控制器的页码文本
   document.getElementById('pageInfo').innerText = `${activePage} / ${totalPages}`;
   
   const prevBtn = document.getElementById('prevPageBtn');
@@ -320,7 +311,6 @@ function toggleSearch(show) {
   }
 }
 
-// 依然在后台静默预拉取剩余 JSON，确保全局模糊搜索的完整度
 async function preloadAllSearchData() {
   let p = 2; 
   while (true) {
