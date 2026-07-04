@@ -227,7 +227,11 @@
 
 <script>
 let currentTab = 'setu';
-let currentPage = { setu: 1, zrsetu: 1 };
+// 优先从 localStorage 读取记忆的页码，如果没有记录则默认为 1
+let currentPage = { 
+  setu: parseInt(localStorage.getItem('setutime_page_setu')) || 1, 
+  zrsetu: parseInt(localStorage.getItem('setutime_page_zrsetu')) || 1 
+};
 let cachePages = {}; 
 let allSetuItems = [];
 let allZrsetuItems = [];
@@ -439,6 +443,7 @@ function handleInputJump(val) {
   }
   
   currentPage[currentTab] = pageNum;
+  localStorage.setItem(`setutime_page_${currentTab}`, pageNum); // 记忆保存输入框跳转的页码
   renderCurrentList();
 }
 
@@ -451,6 +456,7 @@ function changePage(direction) {
   if (newPage < 1 || newPage > totalPages) return;
   
   currentPage[currentTab] = newPage;
+  localStorage.setItem(`setutime_page_${currentTab}`, newPage); // 记忆保存点击翻页的页码
   renderCurrentList();
 }
 
@@ -538,19 +544,25 @@ async function startAppNow() {
   const savedTab = localStorage.getItem('setutime_active_tab') || 'setu';
   initTabSliderSilent(savedTab);
   
-  const firstPageData = await fetchJson(`${rootUrl}data_pages/1.json`);
-  if (!firstPageData) {
+  // 核心修复：直接读取完整的 data.json 用以精确获取全量条数和初始化基础池，消灭刷新时的分页越界空跑问题
+  const globalData = await fetchJson(`${rootUrl}data.json`);
+  if (!globalData) {
     document.getElementById('skeleton').innerText = "数据加载失败，请刷新重试";
     return;
   }
-  cachePages[1] = firstPageData;
   
   const getCount = arr => (arr && arr.length > 0) ? (parseInt(arr[0].file) || arr.length) : 0;
-  totalSetuCount = getCount(firstPageData.setu);
-  totalZrsetuCount = getCount(firstPageData.zrsetu);
+  totalSetuCount = getCount(globalData.setu);
+  totalZrsetuCount = getCount(globalData.zrsetu);
   
-  allSetuItems = (firstPageData.setu || []);
-  allZrsetuItems = (firstPageData.zrsetu || []);
+  allSetuItems = (globalData.setu || []);
+  allZrsetuItems = (globalData.zrsetu || []);
+  
+  // 数据集总页数安全边界校验
+  const maxSetuPages = Math.ceil(totalSetuCount / ITEMS_PER_PAGE) || 1;
+  const maxZrsetuPages = Math.ceil(totalZrsetuCount / ITEMS_PER_PAGE) || 1;
+  if (currentPage.setu > maxSetuPages) currentPage.setu = maxSetuPages;
+  if (currentPage.zrsetu > maxZrsetuPages) currentPage.zrsetu = maxZrsetuPages;
   
   renderCurrentList();
   document.body.classList.add('loaded');
