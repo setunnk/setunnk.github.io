@@ -10,10 +10,10 @@ permissions:
   pages: write
   id-token: write
 
-# 确保同一时间只有一个发布任务在跑，新的来了自动掐断旧的，防止死锁
+# 优化并发控制：让新的部署任务在队列中排队等待，而不是粗暴掐断正在写入服务器的旧任务
 concurrency:
   group: "pages"
-  cancel-in-progress: true 
+  cancel-in-progress: false 
 
 jobs:
   # ----------------------------------------------------
@@ -32,7 +32,7 @@ jobs:
         with:
           node-version: '24'
 
-      - name: 3. 核心步骤：直接在发布前原地生成最新的 data.json 和 1.json（完全复刻你原版逻辑）
+      - name: 3. 核心步骤：直接在发布前原地生成最新的 data.json 和 1.json
         run: |
           cat > generate.js << 'EOF'
           const fs = require('fs');
