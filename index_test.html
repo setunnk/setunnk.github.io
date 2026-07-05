@@ -169,7 +169,7 @@
   html.pink-theme .page-current-input:focus, body.pink-theme .page-current-input:focus { border-color: #f8b8c8; box-shadow: 0 0 0 2px rgba(248,184,200,0.15); }
 
   /* ==========================================================================
-     【新增】深色模式样式配置
+     【修复与优化】深色模式样式配置
      ========================================================================== */
   .dark-mode-toggle { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; background: rgba(255,255,255,0.15); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; border: 1px solid rgba(255,255,255,0.2); transition: all 0.25s; z-index: 101; -webkit-tap-highlight-color: transparent; }
   .dark-mode-toggle:hover { background: rgba(255,255,255,0.3); transform: scale(1.05); }
@@ -202,13 +202,68 @@
   html.dark-theme .search-results .item .title { color: #f9fafb; }
   html.dark-theme .search-results .item .sub { color: #9ca3af !important; }
 </style>
+
+<script>
+/* ==========================================================================
+   【修复核心】前置初始化并增加 Mac/iOS 全自动系统深色模式双向监听
+   ========================================================================== */
+function applyDarkModeState(isDark) {
+  const metaTheme = document.getElementById('meta-theme-color');
+  if (isDark) {
+    document.documentElement.classList.add('dark-theme');
+    if (metaTheme) metaTheme.setAttribute('content', '#111827');
+  } else {
+    document.documentElement.classList.remove('dark-theme');
+    if (metaTheme) {
+      const activeTab = localStorage.getItem('setutime_active_tab') || 'setu';
+      metaTheme.setAttribute('content', activeTab === 'zrsetu' ? '#f8b8c8' : '#428cca');
+    }
+  }
+}
+
+function toggleDarkMode() {
+  const isCurrentlyDark = document.documentElement.classList.contains('dark-theme');
+  const nextDarkState = !isCurrentlyDark;
+  localStorage.setItem('setutime_dark_mode', nextDarkState ? 'true' : 'false');
+  applyDarkModeState(nextDarkState);
+}
+
+function initDarkMode() {
+  const savedDark = localStorage.getItem('setutime_dark_mode');
+  const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+  
+  // 1. 核心判断逻辑修正：如果用户手动设置过，用手动的；如果没设置过，完美跟随系统
+  if (savedDark === 'true' || (savedDark === null && mediaQuery.matches)) {
+    document.documentElement.classList.add('dark-theme');
+  } else {
+    document.documentElement.classList.remove('dark-theme');
+  }
+
+  // 2. 增加针对 Chrome Mac & iOS Safari 的系统实时深色模式改变监听器
+  try {
+    mediaQuery.addEventListener('change', (e) => {
+      if (localStorage.getItem('setutime_dark_mode') === null) {
+        applyDarkModeState(e.matches);
+      }
+    });
+  } catch (err) {
+    // 兼容老版本 iOS Safari
+    mediaQuery.addListener((e) => {
+      if (localStorage.getItem('setutime_dark_mode') === null) {
+        applyDarkModeState(e.matches);
+      }
+    });
+  }
+}
+// 立即执行，规避闪烁
+initDarkMode();
+</script>
 </head>
 <body>
 
 <div class="top-progress-bar" id="topProgressBar"></div>
 
 <header class="app-loading" id="appHeader">
-  <!-- 【新增】深色模式切换按钮 -->
   <div class="dark-mode-toggle" onclick="toggleDarkMode()" title="切换主题">
     <svg class="sun-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
     <svg class="moon-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
@@ -282,32 +337,6 @@ const ITEMS_PER_PAGE = 10;
 const SERVER_ITEMS_PER_FILE = 50;
 
 const rootUrl = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost' ? '/' : 'https://setutime.com/';
-
-/* ==========================================================================
-   【新增】深色模式逻辑核心
-   ========================================================================== */
-function toggleDarkMode() {
-  const isDark = document.documentElement.classList.toggle('dark-theme');
-  localStorage.setItem('setutime_dark_mode', isDark ? 'true' : 'false');
-  const metaTheme = document.getElementById('meta-theme-color');
-  if (metaTheme) {
-    if (isDark) {
-      metaTheme.setAttribute('content', '#111827');
-    } else {
-      metaTheme.setAttribute('content', currentTab === 'zrsetu' ? '#f8b8c8' : '#428cca');
-    }
-  }
-}
-function initDarkMode() {
-  const savedDark = localStorage.getItem('setutime_dark_mode');
-  const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  if (savedDark === 'true' || (savedDark === null && systemDark)) {
-    document.documentElement.classList.add('dark-theme');
-    const metaTheme = document.getElementById('meta-theme-color');
-    if (metaTheme) metaTheme.setAttribute('content', '#111827');
-  }
-}
-initDarkMode();
 
 async function fetchJson(url) {
   try {
