@@ -167,6 +167,40 @@
   html.pink-theme .search-input:focus, body.pink-theme .search-input:focus { border-color: #f8b8c8; box-shadow: 0 0 0 3px rgba(248,184,200,0.15); }
   html.pink-theme .search-results .item:hover, body.pink-theme .search-results .item:hover { border-color: #f8b8c8; background: rgba(248,184,200,0.02); }
   html.pink-theme .page-current-input:focus, body.pink-theme .page-current-input:focus { border-color: #f8b8c8; box-shadow: 0 0 0 2px rgba(248,184,200,0.15); }
+
+  /* ==========================================================================
+     【新增】深色模式样式配置
+     ========================================================================== */
+  .dark-mode-toggle { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; background: rgba(255,255,255,0.15); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; border: 1px solid rgba(255,255,255,0.2); transition: all 0.25s; z-index: 101; -webkit-tap-highlight-color: transparent; }
+  .dark-mode-toggle:hover { background: rgba(255,255,255,0.3); transform: scale(1.05); }
+  .dark-mode-toggle svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+  html.dark-theme .dark-mode-toggle .sun-icon, html:not(.dark-theme) .dark-mode-toggle .moon-icon { display: none; }
+  
+  html.dark-theme, html.dark-theme body { background: #111827 !important; }
+  html.dark-theme body { color: #e5e7eb; }
+  html.dark-theme .main-wrapper { background: #1f2937; box-shadow: 0 -10px 30px rgba(0,0,0,0.2); }
+  html.dark-theme .tabs { background: rgba(55,65,81,0.8); border-color: #4b5563; }
+  html.dark-theme .tab-item { color: #9ca3af; }
+  html.dark-theme .tab-item.active { color: #ffffff; }
+  html.dark-theme ul.list li { background: #1f2937; border-color: #374151; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+  html.dark-theme ul.list li:active { background: #374151; }
+  html.dark-theme .item-title { color: #f9fafb; }
+  html.dark-theme .item-sub { color: #9ca3af !important; }
+  html.dark-theme .item-btn { background: #374151; color: #d1d5db; }
+  html.dark-theme ul.list li:hover .item-btn { color: #ffffff; }
+  html.dark-theme .skeleton-item { background: linear-gradient(90deg, #374151 25%, #4b5563 37%, #374151 63%); background-size: 400% 100%; }
+  html.dark-theme .page-btn { background: #1f2937; border-color: #374151; color: #d1d5db; }
+  html.dark-theme .page-btn.disabled { background: #111827; border-color: #374151; color: #4b5563; }
+  html.dark-theme .page-info-wrap { background: #374151; border-color: #4b5563; color: #9ca3af; }
+  html.dark-theme .page-current-input { background: #1f2937; border-color: #4b5563; color: #f9fafb; }
+  html.dark-theme .search-overlay { background: rgba(17,24,39,0.9); }
+  html.dark-theme .search-input { background: #374151; border-color: #4b5563; color: #f9fafb; }
+  html.dark-theme .search-input:focus { background: #1f2937; }
+  html.dark-theme .search-close { color: #9ca3af; }
+  html.dark-theme .search-close:hover { color: #f9fafb; }
+  html.dark-theme .search-results .item { background: #1f2937; border-color: #374151; }
+  html.dark-theme .search-results .item .title { color: #f9fafb; }
+  html.dark-theme .search-results .item .sub { color: #9ca3af !important; }
 </style>
 </head>
 <body>
@@ -174,6 +208,11 @@
 <div class="top-progress-bar" id="topProgressBar"></div>
 
 <header class="app-loading" id="appHeader">
+  <!-- 【新增】深色模式切换按钮 -->
+  <div class="dark-mode-toggle" onclick="toggleDarkMode()" title="切换主题">
+    <svg class="sun-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+    <svg class="moon-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+  </div>
   <h1 id="main-title">SetuTime！</h1>
   <p id="sub-title">ACGエッチ画像まとめ</p>
 </header>
@@ -244,6 +283,32 @@ const SERVER_ITEMS_PER_FILE = 50;
 
 const rootUrl = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost' ? '/' : 'https://setutime.com/';
 
+/* ==========================================================================
+   【新增】深色模式逻辑核心
+   ========================================================================== */
+function toggleDarkMode() {
+  const isDark = document.documentElement.classList.toggle('dark-theme');
+  localStorage.setItem('setutime_dark_mode', isDark ? 'true' : 'false');
+  const metaTheme = document.getElementById('meta-theme-color');
+  if (metaTheme) {
+    if (isDark) {
+      metaTheme.setAttribute('content', '#111827');
+    } else {
+      metaTheme.setAttribute('content', currentTab === 'zrsetu' ? '#f8b8c8' : '#428cca');
+    }
+  }
+}
+function initDarkMode() {
+  const savedDark = localStorage.getItem('setutime_dark_mode');
+  const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  if (savedDark === 'true' || (savedDark === null && systemDark)) {
+    document.documentElement.classList.add('dark-theme');
+    const metaTheme = document.getElementById('meta-theme-color');
+    if (metaTheme) metaTheme.setAttribute('content', '#111827');
+  }
+}
+initDarkMode();
+
 async function fetchJson(url) {
   try {
     const timestamp = new Date().getTime();
@@ -281,14 +346,14 @@ function handleTabClick(type, index) {
     mainTitle.innerText = "SetuTime！";
     subTitle.innerText = "Cosplayエッチ画像まとめ";
     slider.style.background = '#f8b8c8';
-    if(metaTheme) metaTheme.setAttribute('content', '#f8b8c8');
+    if(metaTheme && !document.documentElement.classList.contains('dark-theme')) metaTheme.setAttribute('content', '#f8b8c8');
   } else {
     document.documentElement.classList.remove('pink-theme');
     document.body.classList.remove('pink-theme');
     mainTitle.innerText = "SetuTime！";
     subTitle.innerText = "ACGエッチ画像まとめ";
     slider.style.background = '#428cca';
-    if(metaTheme) metaTheme.setAttribute('content', '#428cca');
+    if(metaTheme && !document.documentElement.classList.contains('dark-theme')) metaTheme.setAttribute('content', '#428cca');
   }
   
   renderCurrentList(true);
@@ -314,7 +379,7 @@ function initTabSliderSilent(type) {
     mainTitle.innerText = "SetuTime！";
     subTitle.innerText = "Cosplayエッチ画像まとめ";
     slider.style.background = '#f8b8c8';
-    if(metaTheme) metaTheme.setAttribute('content', '#f8b8c8');
+    if(metaTheme && !document.documentElement.classList.contains('dark-theme')) metaTheme.setAttribute('content', '#f8b8c8');
   } else {
     currentTab = 'setu';
     localStorage.setItem('setutime_active_tab', 'setu');
@@ -326,7 +391,7 @@ function initTabSliderSilent(type) {
     mainTitle.innerText = "SetuTime！";
     subTitle.innerText = "ACGエッチ画像まとめ";
     slider.style.background = '#428cca';
-    if(metaTheme) metaTheme.setAttribute('content', '#428cca');
+    if(metaTheme && !document.documentElement.classList.contains('dark-theme')) metaTheme.setAttribute('content', '#428cca');
   }
   
   slider.offsetHeight; 
