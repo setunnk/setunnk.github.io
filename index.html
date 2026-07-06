@@ -208,7 +208,6 @@
 <div class="top-progress-bar" id="topProgressBar"></div>
 
 <header class="app-loading" id="appHeader">
-  <!-- 【新增】深色模式切换按钮 -->
   <div class="dark-mode-toggle" onclick="toggleDarkMode()" title="切换主题">
     <svg class="sun-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
     <svg class="moon-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
@@ -268,10 +267,45 @@
 
 <script>
 let currentTab = 'setu';
+
+/* ==========================================================================
+   【优化核心】带 1 小时过期机制的页码状态存取函数
+   ========================================================================== */
+const ONE_HOUR = 60 * 60 * 1000; // 1小时的毫秒数
+
+function getSavedPage(tabType) {
+  try {
+    const dataStr = localStorage.getItem(`setutime_page_data_${tabType}`);
+    if (!dataStr) return 1;
+    
+    const item = JSON.parse(dataStr);
+    const now = new Date().getTime();
+    
+    // 如果当前时间减去最后存入的时间超过了1小时，说明数据失效，重置回第1页
+    if (now - item.timestamp > ONE_HOUR) {
+      localStorage.removeItem(`setutime_page_data_${tabType}`);
+      return 1;
+    }
+    return parseInt(item.page) || 1;
+  } catch (e) {
+    return 1;
+  }
+}
+
+function savePage(tabType, pageNum) {
+  const item = {
+    page: pageNum,
+    timestamp: new Date().getTime() // 存入当前精确时间戳
+  };
+  localStorage.setItem(`setutime_page_data_${tabType}`, JSON.stringify(item));
+}
+
+// 页面运行时的页码变量通过新函数进行初始化
 let currentPage = { 
-  setu: parseInt(localStorage.getItem('setutime_page_setu')) || 1, 
-  zrsetu: parseInt(localStorage.getItem('setutime_page_zrsetu')) || 1 
+  setu: getSavedPage('setu'), 
+  zrsetu: getSavedPage('zrsetu') 
 };
+
 let cachePages = {}; 
 let allSetuItems = [];
 let allZrsetuItems = [];
@@ -504,7 +538,7 @@ function handleInputJump(val) {
   }
   
   currentPage[currentTab] = pageNum;
-  localStorage.setItem(`setutime_page_${currentTab}`, pageNum);
+  savePage(currentTab, pageNum); // 使用带时间戳的存储函数
   renderCurrentList();
 }
 
@@ -517,7 +551,7 @@ function changePage(direction) {
   if (newPage < 1 || newPage > totalPages) return;
   
   currentPage[currentTab] = newPage;
-  localStorage.setItem(`setutime_page_${currentTab}`, newPage);
+  savePage(currentTab, newPage); // 使用带时间戳的存储函数
   renderCurrentList();
 }
 
