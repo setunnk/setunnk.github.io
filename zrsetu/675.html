@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<link rel="icon" href="https://wdcdn.qpic.cn/MTMxMDI2NjEwNzAzNzc4NzY_4700_9lFpTYi119_srYPg_1782843137" type="image/png">
+<title>涩图time</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  background: #fafafa;
+  color: #333;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 100%;
+  padding: 15px;
+}
+
+.header {
+  text-align: center;
+  padding: 20px 0;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1e1e1e;
+}
+#setu-title {
+    display: block !important;
+    text-align: left !important;
+    width: 100% !important; 
+    max-width: min(92vw, 700px);
+    margin: 15px auto 25px !important; 
+    background-color: #f2f4f6 !important; 
+    border-radius: 999px !important;
+    padding: 12px 25px 12px 35px !important;
+    
+    font-size: 15px;
+    font-weight: 500;
+    color: #4a5568; 
+    line-height: 1.6;
+    
+    border: none;
+    box-sizing: border-box;
+    word-wrap: break-word;
+}
+
+.image-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+  max-width: min(90vw, 700px);
+  margin: 0 auto;
+}
+
+.image-item {
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, .06);
+  background: #f0f2f5;
+  position: relative;
+}
+
+/* 合并后的 .img-wrap：骨架屏 + 图片容器 */
+.img-wrap {
+  position: relative;
+  width: 100%;
+  min-height: 180px;
+  background: #f3f4f6; 
+  overflow: hidden;
+}
+
+/* shimmer 动画层 */
+.img-wrap::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #f3f4f6 0%, #e9eef6 50%, #f3f4f6 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite ease-in-out;
+  z-index: 1;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* 图片本身：淡入 + 保持比例 */
+.img-wrap img {
+  width: 100%;
+  height: auto;
+  display: block;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: 2;
+  object-fit: contain;
+  position: relative;
+}
+
+/* 加载完成：移除 shimmer，显示图片 */
+.img-wrap.loaded::before {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.img-wrap.loaded img {
+  opacity: 1;
+}
+
+/* ===== 下载模块 ===== */
+.explanation {
+  background: linear-gradient(135deg, #f2f4f6, #eceef0);
+  border: 1px solid #dde2e9;
+  border-radius: 16px;
+  padding: 22px;
+  text-align: center;
+  color: #4a5568;
+  margin: 25px 0;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.explanation h2 {
+  font-size: 20px;
+  color: #2d2d2d;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.explanation p {
+  font-size: 15px;
+  color: #506070;
+}
+
+.explanation p span {
+  color: #2d3748;
+  font-weight: 700;
+  text-shadow: 0 0 8px rgba(45, 55, 72, 0.3);
+}
+
+.preserve {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 210px;              /* 下载模块按钮宽度 */
+  max-width: 100%;
+  height: 46px;
+  margin: 15px auto 0;
+  background: linear-gradient(135deg, #5db85d, #4cae4c);
+  box-shadow: 0 6px 16px rgba(93, 184, 93, 0.35);
+  
+  border-radius: 999px;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.1rem;
+  transition: all .3s ease;
+  box-sizing: border-box;
+}
+
+.preserve:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #67c267, #5db85d);
+  box-shadow: 0 8px 22px rgba(93, 184, 93, 0.45);
+}
+
+.save {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 280px;
+    height: 46px;
+    margin: 0 auto;
+    padding: 0;
+    background: #f5f5f5;
+    color: #666;
+    border: 1px solid #e0e0e0;
+    border-radius: 999px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    line-height: 1;
+    box-sizing: border-box;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: all .3s ease;
+    font-family: -apple-system, sans-serif;
+}
+
+.save:hover {
+    background: #eeeeee;
+    color: #333;
+    transform: translateY(-2px); 
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* --- 底部悬浮按钮样式 --- */
+.fixed-button {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%) scale(1);
+  width: calc(100% - 80px);
+  max-width: 500px;
+  z-index: 1000;
+  will-change: transform, opacity; 
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+.fixed-button.hidden {
+  transform: translateX(-50%) translateY(20px) scale(0.85);
+  opacity: 0;
+}
+
+.fixed-button a {
+  display: block;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  color: #000 !important;
+  padding: 10px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 600;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  border: 1px solid rgba(255,255,255,0.6);
+  pointer-events: auto;
+  transition: .3s;
+}
+
+.fixed-button a:hover {
+  background: rgba(255, 255, 255, 0.95) !important;
+  transform: translateY(-2px);
+}
+
+/* 下一期模块 */
+.prev-next-link {
+  display: block;
+  margin: 15px 0 40px;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.prev-next-card {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  background: #000000;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.next-text {
+  color: #ffffff;
+  font-family: "PingFang SC", -apple-system, sans-serif;
+  font-weight: 800;
+  font-size: 1.8rem;
+  letter-spacing: 2px;
+  z-index: 2;
+}
+
+.next-sub {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.75rem;
+  letter-spacing: 4px;
+  margin-top: 8px;
+  z-index: 2;
+  text-transform: uppercase;
+}
+
+.responsive-video {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  object-fit: contain;
+}
+  
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1 class="title">涩图time No.675</h1>
+  </div>
+
+  <div class="image-grid">
+ 
+    <div id="setu-title" class="title-capsule">
+      # DJAWA Photo - ZziZzi - New Town Bride [206P]
+</div>
+     
+    <div style="text-align:center;">
+<a href="#" class="save save-blue">>>>原图保存<<<</a>
+</div>
+
+    
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-1.webp" alt="1"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-2.webp" alt="2"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-3.webp" alt="3"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-4.webp" alt="4"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-5.webp" alt="5"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-6.webp" alt="6"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-7.webp" alt="7"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-8.webp" alt="8"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-9.webp" alt="9"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-10.webp" alt="10"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-11.webp" alt="11"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-12.webp" alt="12"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-13.webp" alt="13"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-14.webp" alt="14"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-15.webp" alt="15"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-16.webp" alt="16"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-17.webp" alt="17"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-18.webp" alt="18"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-19.webp" alt="19"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-20.webp" alt="20"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-21.webp" alt="21"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-22.webp" alt="22"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-23.webp" alt="23"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-24.webp" alt="24"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-25.webp" alt="25"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-26.webp" alt="26"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-27.webp" alt="27"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-28.webp" alt="28"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-29.webp" alt="29"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-30.webp" alt="30"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-31.webp" alt="31"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-32.webp" alt="32"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-33.webp" alt="33"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-34.webp" alt="34"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-35.webp" alt="35"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-36.webp" alt="36"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-37.webp" alt="37"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-38.webp" alt="38"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-39.webp" alt="39"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-40.webp" alt="40"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-41.webp" alt="41"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-42.webp" alt="42"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-43.webp" alt="43"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-44.webp" alt="44"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-45.webp" alt="45"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-46.webp" alt="46"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-47.webp" alt="47"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-48.webp" alt="48"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-49.webp" alt="49"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-50.webp" alt="50"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-51.webp" alt="51"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-52.webp" alt="52"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-53.webp" alt="53"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-54.webp" alt="54"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-55.webp" alt="55"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-56.webp" alt="56"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-57.webp" alt="57"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-58.webp" alt="58"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-59.webp" alt="59"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-60.webp" alt="60"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-61.webp" alt="61"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-62.webp" alt="62"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-63.webp" alt="63"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-64.webp" alt="64"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-65.webp" alt="65"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-66.webp" alt="66"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-67.webp" alt="67"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-68.webp" alt="68"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-69.webp" alt="69"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-70.webp" alt="70"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-71.webp" alt="71"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-72.webp" alt="72"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-73.webp" alt="73"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-74.webp" alt="74"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-75.webp" alt="75"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-76.webp" alt="76"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-77.webp" alt="77"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-78.webp" alt="78"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-79.webp" alt="79"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-80.webp" alt="80"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-81.webp" alt="81"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-82.webp" alt="82"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-83.webp" alt="83"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-84.webp" alt="84"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-85.webp" alt="85"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-86.webp" alt="86"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-87.webp" alt="87"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-88.webp" alt="88"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-89.webp" alt="89"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-90.webp" alt="90"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-91.webp" alt="91"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-92.webp" alt="92"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-93.webp" alt="93"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-94.webp" alt="94"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-95.webp" alt="95"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-96.webp" alt="96"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-97.webp" alt="97"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-98.webp" alt="98"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-99.webp" alt="99"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-100.webp" alt="100"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-101.webp" alt="101"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-102.webp" alt="102"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-103.webp" alt="103"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-104.webp" alt="104"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-105.webp" alt="105"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-106.webp" alt="106"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-107.webp" alt="107"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-108.webp" alt="108"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-109.webp" alt="109"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-110.webp" alt="110"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-111.webp" alt="111"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-112.webp" alt="112"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-113.webp" alt="113"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-114.webp" alt="114"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-115.webp" alt="115"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-116.webp" alt="116"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-117.webp" alt="117"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-118.webp" alt="118"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-119.webp" alt="119"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-120.webp" alt="120"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-121.webp" alt="121"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-122.webp" alt="122"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-123.webp" alt="123"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-124.webp" alt="124"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-125.webp" alt="125"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-126.webp" alt="126"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-127.webp" alt="127"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-128.webp" alt="128"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-129.webp" alt="129"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-130.webp" alt="130"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-131.webp" alt="131"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-132.webp" alt="132"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-133.webp" alt="133"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-134.webp" alt="134"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-135.webp" alt="135"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-136.webp" alt="136"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-137.webp" alt="137"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-138.webp" alt="138"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-139.webp" alt="139"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-140.webp" alt="140"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-141.webp" alt="141"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-142.webp" alt="142"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-143.webp" alt="143"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-144.webp" alt="144"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-145.webp" alt="145"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-146.webp" alt="146"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-147.webp" alt="147"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-148.webp" alt="148"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-149.webp" alt="149"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-150.webp" alt="150"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-151.webp" alt="151"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-152.webp" alt="152"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-153.webp" alt="153"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-154.webp" alt="154"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-155.webp" alt="155"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-156.webp" alt="156"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-157.webp" alt="157"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-158.webp" alt="158"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-159.webp" alt="159"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-160.webp" alt="160"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-161.webp" alt="161"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-162.webp" alt="162"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-163.webp" alt="163"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-164.webp" alt="164"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-165.webp" alt="165"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-166.webp" alt="166"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-167.webp" alt="167"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-168.webp" alt="168"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-169.webp" alt="169"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-170.webp" alt="170"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-171.webp" alt="171"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-172.webp" alt="172"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-173.webp" alt="173"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-174.webp" alt="174"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-175.webp" alt="175"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-176.webp" alt="176"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-177.webp" alt="177"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-178.webp" alt="178"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-179.webp" alt="179"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-180.webp" alt="180"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-181.webp" alt="181"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-182.webp" alt="182"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-183.webp" alt="183"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-184.webp" alt="184"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-185.webp" alt="185"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-186.webp" alt="186"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-187.webp" alt="187"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-188.webp" alt="188"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-189.webp" alt="189"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-190.webp" alt="190"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-191.webp" alt="191"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-192.webp" alt="192"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-193.webp" alt="193"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-194.webp" alt="194"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-195.webp" alt="195"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-196.webp" alt="196"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-197.webp" alt="197"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-198.webp" alt="198"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-199.webp" alt="199"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-200.webp" alt="200"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-201.webp" alt="201"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-202.webp" alt="202"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-203.webp" alt="203"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-204.webp" alt="204"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-205.webp" alt="205"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://r2.setutime.com/zrsetu_pic/pic-675-206.webp" alt="206"></div></div>
+
+
+
+    <div class="explanation">
+      <h2>本期无水印原图</h2>
+ <a href="" target="_blank" class="preserve">>>>原图保存<<<</a>
+    </div>
+    
+    <a href="#" id="prev-link" class="prev-next-link">
+        <div class="prev-next-card">
+            <span class="next-text">跳转下一期 >>></span>
+            <span id="prev-sub" class="next-sub">Next Issue Gallery</span>
+        </div>
+    </a><br>
+
+  <div class="fixed-button"><a href="https://setutime.com">SetuTime 合集</a>
+</div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    if ('IntersectionObserver' in window) {
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    const wrap = img.parentElement;
+                    if (img.dataset.src) {
+                        img.src = img.dataset.src;
+                        img.onload = () => { wrap.classList.add('loaded'); };
+                    }
+                    observer.unobserve(img);
+                }
+            });
+        }, { rootMargin: "0px 0px 300px 0px" });
+
+        const imgs = document.querySelectorAll('.img-wrap img');
+        imgs.forEach(img => imageObserver.observe(img));
+    } else {
+        const imgs = document.querySelectorAll('.img-wrap img');
+        imgs.forEach(img => {
+            img.src = img.dataset.src;
+            img.onload = () => img.parentElement.classList.add('loaded');
+        });
+    }
+    const titleEl = document.querySelector('.title');
+    if (titleEl) {
+        const match = titleEl.innerText.match(/\d+/);
+        if (match) {
+            const currentNo = parseInt(match[0]);
+            const prevNo = currentNo - 1;
+            const prevLink = document.getElementById('prev-link');
+            if (prevLink) {
+                prevLink.href = `https://setutime.com/zrsetu/${prevNo}`;
+            }
+            const downloadUrl = `https://dl.setutime.com/support?id=zrsetu_${currentNo}`;
+            const topSaveBtn = document.querySelector('.save-blue');
+            if (topSaveBtn) {
+                topSaveBtn.href = downloadUrl;
+            }
+            const bottomSaveBtn = document.querySelector('.preserve');
+            if (bottomSaveBtn) {
+                bottomSaveBtn.href = downloadUrl;
+            }
+        }
+    }
+
+
+    const fixedBtn = document.querySelector('.fixed-button');
+    let lastScrollY = window.scrollY;
+    let ticking = false;
+
+    function updateButtonVisibility() {
+        const currentScrollY = window.scrollY;
+        if (currentScrollY > lastScrollY && currentScrollY > 10) {
+            fixedBtn.classList.add('hidden');
+        } else {
+            fixedBtn.classList.remove('hidden');
+        }
+        lastScrollY = currentScrollY;
+        ticking = false;
+    }
+
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            window.requestAnimationFrame(updateButtonVisibility);
+            ticking = true;
+        }
+    });
+});
+</script>
+</body>
+</html>
