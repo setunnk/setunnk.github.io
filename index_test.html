@@ -169,34 +169,25 @@
   html.pink-theme .page-current-input:focus, body.pink-theme .page-current-input:focus { border-color: #f8b8c8; box-shadow: 0 0 0 2px rgba(248,184,200,0.15); }
 
   /* ==========================================================================
-     【新增】深色模式专用 UI 映射与按钮容器样式
+     【新增】深色模式样式配置
      ========================================================================== */
-  .dark-mode-toggle { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; border: 1px solid rgba(255,255,255,0.25); transition: all 0.25s; z-index: 101; -webkit-tap-highlight-color: transparent; }
+  .dark-mode-toggle { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; background: rgba(255,255,255,0.15); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; border: 1px solid rgba(255,255,255,0.2); transition: all 0.25s; z-index: 101; -webkit-tap-highlight-color: transparent; }
   .dark-mode-toggle:hover { background: rgba(255,255,255,0.3); transform: scale(1.05); }
-  .dark-mode-toggle:active { transform: scale(0.95); }
   .dark-mode-toggle svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
-  
-  /* 依靠挂载在 html 上的 .dark-theme 动态显示太阳或月亮图标 */
   html.dark-theme .dark-mode-toggle .sun-icon, html:not(.dark-theme) .dark-mode-toggle .moon-icon { display: none; }
   
-  /* 深色下全局背景切换 */
   html.dark-theme, html.dark-theme body { background: #111827 !important; }
   html.dark-theme body { color: #e5e7eb; }
-  
-  /* 下方主容器及组件配色深色映射 */
   html.dark-theme .main-wrapper { background: #1f2937; box-shadow: 0 -10px 30px rgba(0,0,0,0.2); }
   html.dark-theme .tabs { background: rgba(55,65,81,0.8); border-color: #4b5563; }
   html.dark-theme .tab-item { color: #9ca3af; }
   html.dark-theme .tab-item.active { color: #ffffff; }
-  html.dark-theme ul.list li { background: #1f2937; border-color: #374151; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+  html.dark-theme ul.list li { background: #1f2937; border-color: #374151; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
   html.dark-theme ul.list li:active { background: #374151; }
   html.dark-theme .item-title { color: #f9fafb; }
   html.dark-theme .item-sub { color: #9ca3af !important; }
   html.dark-theme .item-btn { background: #374151; color: #d1d5db; }
-  html.dark-theme ul.list li:hover .item-btn { color: #ffffff; background: #428cca; }
-  html.pink-theme.dark-theme ul.list li:hover .item-btn { background: #f8b8c8; }
-  
-  /* 骨架屏、分页与搜索框深色映射 */
+  html.dark-theme ul.list li:hover .item-btn { color: #ffffff; }
   html.dark-theme .skeleton-item { background: linear-gradient(90deg, #374151 25%, #4b5563 37%, #374151 63%); background-size: 400% 100%; }
   html.dark-theme .page-btn { background: #1f2937; border-color: #374151; color: #d1d5db; }
   html.dark-theme .page-btn.disabled { background: #111827; border-color: #374151; color: #4b5563; }
@@ -211,62 +202,6 @@
   html.dark-theme .search-results .item .title { color: #f9fafb; }
   html.dark-theme .search-results .item .sub { color: #9ca3af !important; }
 </style>
-
-<script>
-  /* ==========================================================================
-     【新增核心】顶部同步执行：智能判定系统状态，杜绝弱网环境下首屏闪白
-     ========================================================================== */
-  function applyDarkModeState(isDark) {
-    const metaTheme = document.getElementById('meta-theme-color');
-    if (isDark) {
-      document.documentElement.classList.add('dark-theme');
-      if (metaTheme) metaTheme.setAttribute('content', '#111827');
-    } else {
-      document.documentElement.classList.remove('dark-theme');
-      if (metaTheme) {
-        const activeTab = localStorage.getItem('setutime_active_tab') || 'setu';
-        metaTheme.setAttribute('content', activeTab === 'zrsetu' ? '#f8b8c8' : '#428cca');
-      }
-    }
-  }
-
-  function toggleDarkMode() {
-    const isCurrentlyDark = document.documentElement.classList.contains('dark-theme');
-    const nextDarkState = !isCurrentlyDark;
-    // 记录用户手动覆盖意图
-    localStorage.setItem('setutime_dark_mode', nextDarkState ? 'true' : 'false');
-    applyDarkModeState(nextDarkState);
-  }
-
-  function initDarkMode() {
-    const savedDark = localStorage.getItem('setutime_dark_mode');
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    
-    // 策略：如果手动设置过则遵从手动；若从未设置，全自动完美同步系统
-    if (savedDark === 'true' || (savedDark === null && mediaQuery.matches)) {
-      document.documentElement.classList.add('dark-theme');
-    } else {
-      document.documentElement.classList.remove('dark-theme');
-    }
-
-    // 监听 Mac Chrome / iOS Safari 控制中心的主题切换动态事件
-    try {
-      mediaQuery.addEventListener('change', (e) => {
-        if (localStorage.getItem('setutime_dark_mode') === null) {
-          applyDarkModeState(e.matches);
-        }
-      });
-    } catch (err) {
-      // 兼容旧版 iOS Safari 引擎
-      mediaQuery.addListener((e) => {
-        if (localStorage.getItem('setutime_dark_mode') === null) {
-          applyDarkModeState(e.matches);
-        }
-      });
-    }
-  }
-  initDarkMode(); // 立即同步调用
-</script>
 </head>
 <body>
 
@@ -332,10 +267,45 @@
 
 <script>
 let currentTab = 'setu';
+
+/* ==========================================================================
+   【优化核心】带 1 小时过期机制的页码状态存取函数
+   ========================================================================== */
+const ONE_HOUR = 60 * 60 * 1000; // 1小时的毫秒数
+
+function getSavedPage(tabType) {
+  try {
+    const dataStr = localStorage.getItem(`setutime_page_data_${tabType}`);
+    if (!dataStr) return 1;
+    
+    const item = JSON.parse(dataStr);
+    const now = new Date().getTime();
+    
+    // 如果当前时间减去最后存入的时间超过了1小时，说明数据失效，重置回第1页
+    if (now - item.timestamp > ONE_HOUR) {
+      localStorage.removeItem(`setutime_page_data_${tabType}`);
+      return 1;
+    }
+    return parseInt(item.page) || 1;
+  } catch (e) {
+    return 1;
+  }
+}
+
+function savePage(tabType, pageNum) {
+  const item = {
+    page: pageNum,
+    timestamp: new Date().getTime() // 存入当前精确时间戳
+  };
+  localStorage.setItem(`setutime_page_data_${tabType}`, JSON.stringify(item));
+}
+
+// 页面运行时的页码变量通过新函数进行初始化
 let currentPage = { 
-  setu: parseInt(localStorage.getItem('setutime_page_setu')) || 1, 
-  zrsetu: parseInt(localStorage.getItem('setutime_page_zrsetu')) || 1 
+  setu: getSavedPage('setu'), 
+  zrsetu: getSavedPage('zrsetu') 
 };
+
 let cachePages = {}; 
 let allSetuItems = [];
 let allZrsetuItems = [];
@@ -346,6 +316,32 @@ const ITEMS_PER_PAGE = 10;
 const SERVER_ITEMS_PER_FILE = 50;
 
 const rootUrl = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost' ? '/' : 'https://setutime.com/';
+
+/* ==========================================================================
+   【新增】深色模式逻辑核心
+   ========================================================================== */
+function toggleDarkMode() {
+  const isDark = document.documentElement.classList.toggle('dark-theme');
+  localStorage.setItem('setutime_dark_mode', isDark ? 'true' : 'false');
+  const metaTheme = document.getElementById('meta-theme-color');
+  if (metaTheme) {
+    if (isDark) {
+      metaTheme.setAttribute('content', '#111827');
+    } else {
+      metaTheme.setAttribute('content', currentTab === 'zrsetu' ? '#f8b8c8' : '#428cca');
+    }
+  }
+}
+function initDarkMode() {
+  const savedDark = localStorage.getItem('setutime_dark_mode');
+  const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  if (savedDark === 'true' || (savedDark === null && systemDark)) {
+    document.documentElement.classList.add('dark-theme');
+    const metaTheme = document.getElementById('meta-theme-color');
+    if (metaTheme) metaTheme.setAttribute('content', '#111827');
+  }
+}
+initDarkMode();
 
 async function fetchJson(url) {
   try {
@@ -542,7 +538,7 @@ function handleInputJump(val) {
   }
   
   currentPage[currentTab] = pageNum;
-  localStorage.setItem(`setutime_page_${currentTab}`, pageNum);
+  savePage(currentTab, pageNum); // 使用带时间戳的存储函数
   renderCurrentList();
 }
 
@@ -555,7 +551,7 @@ function changePage(direction) {
   if (newPage < 1 || newPage > totalPages) return;
   
   currentPage[currentTab] = newPage;
-  localStorage.setItem(`setutime_page_${currentTab}`, newPage);
+  savePage(currentTab, newPage); // 使用带时间戳的存储函数
   renderCurrentList();
 }
 
