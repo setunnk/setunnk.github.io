@@ -2,6 +2,7 @@ name: Auto Update data.json
 on:
   push:
     paths:
+      - 'acg/**'
       - 'setu/**'
       - 'zrsetu/**'
   workflow_dispatch:
@@ -61,7 +62,8 @@ jobs:
               .sort((a,b) => (parseInt(b.file)||0) - (parseInt(a.file)||0));
           }
 
-          // 1. 获取全量排序后的数据
+          // 1. 获取全量排序后的三个分类数据
+          const acgItems = getItems('acg');
           const setuItems = getItems('setu');
           const zrsetuItems = getItems('zrsetu');
           const updatedTime = new Date().toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'}).replace(/\//g,'-');
@@ -69,6 +71,7 @@ jobs:
           // 2. 保留原始全量 data.json 用于全局检索
           const allData = {
             updated: updatedTime,
+            acg: acgItems,
             setu: setuItems,
             zrsetu: zrsetuItems
           };
@@ -81,11 +84,18 @@ jobs:
             fs.mkdirSync(pageDir);
           }
 
-          const totalPages = Math.max(Math.ceil(setuItems.length / PAGESIZE), Math.ceil(zrsetuItems.length / PAGESIZE));
+          // 同时对比三个分类的数据量，得出最大总页数
+          const totalPages = Math.max(
+            Math.ceil(acgItems.length / PAGESIZE), 
+            Math.ceil(setuItems.length / PAGESIZE), 
+            Math.ceil(zrsetuItems.length / PAGESIZE)
+          );
+          
           for (let p = 1; p <= totalPages; p++) {
             const start = (p - 1) * PAGESIZE;
             const pageData = {
               updated: updatedTime,
+              acg: acgItems.slice(start, start + PAGESIZE),
               setu: setuItems.slice(start, start + PAGESIZE),
               zrsetu: zrsetuItems.slice(start, start + PAGESIZE)
             };
@@ -101,5 +111,5 @@ jobs:
           git config user.email "bot@github.com"
           git add data.json data_pages/*.json
           git diff --quiet && git diff --staged --quiet ||
-          git commit -m "精简结构并自动切分50条数据 [skip ci]"
+          git commit -m "精简结构并自动切分50条数据（含全年龄向） [skip ci]"
           git push origin main
