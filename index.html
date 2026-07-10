@@ -5,22 +5,26 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" id="meta-theme-color" content="#428cca">
+<meta name="theme-color" id="meta-theme-color" content="#50C878">
 <link rel="icon" href="https://wdcdn.qpic.cn/MTMxMDI2NjEwNzAzNzc4NzY_582527_m5n34EQ_C6U8f2WE_1782832113" type="image/png">
 <meta name="description" content="点击前往SetuTime~">
 <title>SetuTime！</title>
 <style>
-  /* 核心基础背景：确保首屏无论哪个分类都先填满纯净背景，消灭露出白底的问题 */
+  /* 核心基础背景 */
   html, body {
-    background: #428cca;
+    background: #50C878; /* 默认全年龄向：清爽薄荷绿[cite: 4] */
     margin: 0;
     padding: 0;
     min-height: 100vh;
     transition: background 0.3s cubic-bezier(0.25, 1, 0.5, 1);
   }
   
+  html.blue-theme, body.blue-theme {
+    background: #428cca; /* 二次元篇：经典晴空蓝 */
+  }
+
   html.pink-theme, body.pink-theme {
-    background: #f8b8c8;
+    background: #f8b8c8; /* cos篇：浪漫樱花粉 */
   }
 
   body {
@@ -31,14 +35,12 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  /* ==========================================================================
-     【方案二核心】顶部微动效流光进度条 & 标题呼吸动画
-     ========================================================================== */
+  /* 顶部微动效流光进度条 & 标题呼吸动画 */
   .top-progress-bar {
     position: fixed;
     top: 0;
     left: 0;
-    width: 0%; /* 由 JS 动态驱动或配合 CSS 模拟假进度 */
+    width: 0%;
     height: 3px;
     background: linear-gradient(90deg, rgba(255,255,255,0.4), rgba(255,255,255,1), rgba(255,255,255,0.4));
     background-size: 200% 100%;
@@ -48,13 +50,11 @@
     transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease-out;
     animation: barShimmer 1.5s infinite linear;
   }
-  /* 流光闪烁 */
   @keyframes barShimmer {
     0% { background-position: 200% 0; }
     100% { background-position: -200% 0; }
   }
 
-  /* 数据加载前，标题组处于加载呼吸状态 */
   header.app-loading {
     animation: headerBreathe 1.6s ease-in-out infinite alternate;
   }
@@ -62,23 +62,15 @@
     0% { opacity: 0.45; transform: scale(0.98); }
     100% { opacity: 0.9; transform: scale(1); }
   }
-  /* ==========================================================================
-     【方案二核心结束】
-     ========================================================================== */
 
-  /* 核心主包装容器：转场时自下方轻柔升起 */
   header, .main-wrapper { 
     opacity: 0; 
     transform: translateY(20px); 
     transition: opacity 0.5s cubic-bezier(0.25, 1, 0.5, 1), transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
   }
-  /* 首屏在没有 loaded 之前，header 已经展现呼吸态，所以先放开 header 展现 */
   header { opacity: 1; transform: translateY(0); }
-  
-  /* 完全渲染完成状态 */
   .loaded .main-wrapper { opacity: 1; transform: translateY(0); }
   
-  /* 列表项独特的交错淡入与平滑动效 */
   ul.list li { opacity: 0; transform: translateY(10px); transition: opacity 0.35s ease-out, transform 0.35s cubic-bezier(0.2, 1, 0.2, 1); }
   .loaded ul.list li.show { opacity: 1; transform: translateY(0); }
   
@@ -97,16 +89,18 @@
 
   .container { max-width: 700px; margin: 0 auto; padding: 30px 20px 100px; box-sizing: border-box; }
   
-  /* 胶囊切换条 */
+  /* 三等分胶囊切换条 */
   .tabs { display: flex; background: rgba(243,244,246,0.86); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); padding: 5px; border-radius: 30px; margin-bottom: 25px; position: relative; border: 1px solid #e5e7eb; touch-action: manipulation; }
   .tab-item { flex: 1; text-align: center; padding: 12px 0; font-weight: 600; font-size: 15px; color: #4b5563; cursor: pointer; z-index: 2; transition: color 0.2s, transform 0.1s; border-radius: 25px; -webkit-tap-highlight-color: transparent; user-select: none; }
   .tab-item:active { transform: scale(0.96); opacity: 0.9; }
   .tab-item.active { color: #ffffff; }
-  .tab-slider { position: absolute; top: 5px; left: 5px; width: calc(50% - 5px); height: calc(100% - 10px); background: #428cca; border-radius: 25px; z-index: 1; transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), background 0.3s; box-shadow: 0 4px 12px rgba(66,140,202,0.2); }
+  
+  /* 滑块宽度精确调整为三等分 (33.3333%) */
+  .tab-slider { position: absolute; top: 5px; left: 5px; width: calc(33.3333% - 5px); height: calc(100% - 10px); background: #50C878; border-radius: 25px; z-index: 1; transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), background 0.3s; box-shadow: 0 4px 12px rgba(80,200,120,0.2); }
   
   ul.list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 14px; min-height: 400px; }
   ul.list li { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 18px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: all 0.25s ease; box-shadow: 0 2px 6px rgba(0,0,0,0.01); -webkit-tap-highlight-color: transparent; }
-  ul.list li:hover { border-color: #428cca; box-shadow: 0 6px 16px rgba(66,140,202,0.06); }
+  ul.list li:hover { border-color: #50C878; box-shadow: 0 6px 16px rgba(80,200,120,0.06); }
   ul.list li:active { transform: scale(0.98); background: #f9fafb; }
   
   .item-left { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 0; text-align: left; padding-right: 12px; }
@@ -114,9 +108,9 @@
   .item-sub { font-size: 13px !important; color: #6b7280 !important; line-height: 1.5 !important; white-space: normal !important; word-break: break-all !important; overflow: visible !important; }
   
   .item-btn { background: #f3f4f6; color: #4b5563; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; transition: all 0.25s; flex-shrink: 0; user-select: none; }
-  ul.list li:hover .item-btn { background: #428cca; color: #ffffff; }
+  ul.list li:hover .item-btn { background: #50C878; color: #ffffff; }
   
-  /* 现代波浪式渐变流光骨架屏加载动画 */
+  /* 现代波浪式渐变骨架屏 */
   .skeleton-list { display: flex; flex-direction: column; gap: 14px; min-height: 400px; }
   .skeleton-item { height: 72px; background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 37%, #f3f4f6 63%); background-size: 400% 100%; animation: skeleton-loading 1.4s ease infinite; border-radius: 18px; }
   @keyframes skeleton-loading { 0% { background-position: 100% 0 } 100% { background-position: 0 0 } }
@@ -124,18 +118,18 @@
   /* 分页整体控制栏 */
   .pagination-container { display: flex; align-items: center; justify-content: space-between; margin-top: 35px; gap: 10px; user-select: none; }
   .page-btn { flex: 1; max-width: 100px; text-align: center; padding: 11px 0; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 22px; color: #4b5563; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s; -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
-  .page-btn:hover:not(.disabled) { border-color: #428cca; color: #428cca; background: rgba(66,140,202,0.02); }
+  .page-btn:hover:not(.disabled) { border-color: #50C878; color: #50C878; background: rgba(80,200,120,0.02); }
   .page-btn:active:not(.disabled) { transform: scale(0.95); }
   .page-btn.disabled { color: #d1d5db; background: #f9fafb; border-color: #e5e7eb; cursor: not-allowed; transform: none; opacity: 0.6; }
 
   .page-info-wrap { display: flex; align-items: center; justify-content: center; background: #f3f4f6; border: 1px solid #e5e7eb; padding: 0 16px; height: 40px; border-radius: 22px; gap: 6px; font-size: 14px; color: #6b7280; font-weight: 600; box-sizing: border-box; }
   .page-current-input { width: 38px; height: 24px; background: #ffffff; border: 1px solid #d1d5db; border-radius: 12px; text-align: center; font-size: 14px; font-weight: 700; color: #111827; outline: none; transition: all 0.2s; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05); -moz-appearance: textfield; box-sizing: border-box; padding: 0; }
   .page-current-input::-webkit-outer-spin-button, .page-current-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-  .page-current-input:focus { border-color: #428cca; box-shadow: 0 0 0 2px rgba(66,140,202,0.15); }
+  .page-current-input:focus { border-color: #50C878; box-shadow: 0 0 0 2px rgba(80,200,120,0.15); }
   
   /* 悬浮搜索 */
-  .search-trigger { position: fixed; bottom: 25px; right: 25px; width: 54px; height: 54px; background: #428cca; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(66,140,202,0.3); cursor: pointer; z-index: 99; transition: all 0.25s ease; -webkit-tap-highlight-color: transparent; }
-  .search-trigger:hover { transform: scale(1.08) translateY(-2px); background: #53a3e6; box-shadow: 0 8px 24px rgba(66,140,202,0.4); }
+  .search-trigger { position: fixed; bottom: 25px; right: 25px; width: 54px; height: 54px; background: #50C878; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(80,200,120,0.3); cursor: pointer; z-index: 99; transition: all 0.25s ease; -webkit-tap-highlight-color: transparent; }
+  .search-trigger:hover { transform: scale(1.08) translateY(-2px); background: #62d387; box-shadow: 0 8px 24px rgba(80,200,120,0.4); }
   .search-trigger:active { transform: scale(0.95); }
   .search-trigger svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
   
@@ -145,7 +139,7 @@
   .search-header { padding: 20px; display: flex; align-items: center; max-width: 600px; width: 100%; margin: 0 auto; box-sizing: border-box; gap: 15px; }
   .search-input-wrap { position: relative; flex: 1; }
   .search-input { width: 100%; height: 46px; background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 23px; padding: 0 20px 0 45px; font-size: 16px; color: #111827; outline: none; box-sizing: border-box; transition: all 0.25s; }
-  .search-input:focus { background: #ffffff; border-color: #428cca; box-shadow: 0 0 0 3px rgba(66,140,202,0.15); }
+  .search-input:focus { background: #ffffff; border-color: #50C878; box-shadow: 0 0 0 3px rgba(80,200,120,0.15); }
   .search-icon-left { position: absolute; left: 18px; top: 13px; color: #9ca3af; }
   .search-icon-left svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.5; }
   .search-close { font-size: 15px; color: #6b7280; cursor: pointer; font-weight: 600; padding: 5px 10px; -webkit-tap-highlight-color: transparent; user-select: none; }
@@ -153,11 +147,22 @@
   
   .search-results { flex: 1; overflow-y: auto; max-width: 600px; width: 100%; margin: 0 auto; padding: 10px 20px 40px; box-sizing: border-box; }
   .search-results .item { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 16px; padding: 14px 18px; margin-bottom: 12px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: all 0.2s; }
-  .search-results .item:hover { border-color: #428cca; background: rgba(66,140,202,0.01); transform: translateY(-1px); }
+  .search-results .item:hover { border-color: #50C878; background: rgba(80,200,120,0.01); transform: translateY(-1px); }
   .search-results .item .title { font-weight: 600; color: #111827; font-size: 15px; flex-shrink: 0; margin-right: 15px; }
   .search-results .item .sub { color: #6b7280 !important; font-size: 13px !important; line-height: 1.4 !important; white-space: normal !important; word-break: break-all !important; overflow: visible !important; flex: 1; text-align: right; }
   
-  /* Pink Theme (Cosplay) 色彩映射 */
+  /* Blue Theme (二次元篇) 样式复写 */
+  html.blue-theme .tab-slider, body.blue-theme .tab-slider { background: #428cca; box-shadow: 0 4px 12px rgba(66,140,202,0.3); }
+  html.blue-theme ul.list li:hover, body.blue-theme ul.list li:hover { border-color: #428cca; box-shadow: 0 6px 16px rgba(66,140,202,0.1); }
+  html.blue-theme ul.list li:hover .item-btn, body.blue-theme ul.list li:hover .item-btn { background: #428cca; color: #ffffff; }
+  html.blue-theme .page-btn:hover:not(.disabled), body.blue-theme .page-btn:hover:not(.disabled) { border-color: #428cca; color: #428cca; background: rgba(66,140,202,0.03); }
+  html.blue-theme .search-trigger, body.blue-theme .search-trigger { background: #428cca; box-shadow: 0 6px 20px rgba(66,140,202,0.4); }
+  html.blue-theme .search-trigger:hover, body.blue-theme .search-trigger:hover { background: #53a3e6; box-shadow: 0 8px 24px rgba(66,140,202,0.5); }
+  html.blue-theme .search-input:focus, body.blue-theme .search-input:focus { border-color: #428cca; box-shadow: 0 0 0 3px rgba(66,140,202,0.15); }
+  html.blue-theme .search-results .item:hover, body.blue-theme .search-results .item:hover { border-color: #428cca; background: rgba(66,140,202,0.02); }
+  html.blue-theme .page-current-input:focus, body.blue-theme .page-current-input:focus { border-color: #428cca; box-shadow: 0 0 0 2px rgba(66,140,202,0.15); }
+
+  /* Pink Theme (Cosplay) 样式复写 */
   html.pink-theme .tab-slider, body.pink-theme .tab-slider { background: #f8b8c8; box-shadow: 0 4px 12px rgba(248,184,200,0.3); }
   html.pink-theme ul.list li:hover, body.pink-theme ul.list li:hover { border-color: #f8b8c8; box-shadow: 0 6px 16px rgba(248,184,200,0.1); }
   html.pink-theme ul.list li:hover .item-btn, body.pink-theme ul.list li:hover .item-btn { background: #f8b8c8; color: #ffffff; }
@@ -168,9 +173,7 @@
   html.pink-theme .search-results .item:hover, body.pink-theme .search-results .item:hover { border-color: #f8b8c8; background: rgba(248,184,200,0.02); }
   html.pink-theme .page-current-input:focus, body.pink-theme .page-current-input:focus { border-color: #f8b8c8; box-shadow: 0 0 0 2px rgba(248,184,200,0.15); }
 
-  /* ==========================================================================
-     【新增】深色模式样式配置
-     ========================================================================== */
+  /* 深色模式全局样式 */
   .dark-mode-toggle { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; background: rgba(255,255,255,0.15); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; border: 1px solid rgba(255,255,255,0.2); transition: all 0.25s; z-index: 101; -webkit-tap-highlight-color: transparent; }
   .dark-mode-toggle:hover { background: rgba(255,255,255,0.3); transform: scale(1.05); }
   .dark-mode-toggle svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
@@ -213,13 +216,14 @@
     <svg class="moon-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
   </div>
   <h1 id="main-title">SetuTime！</h1>
-  <p id="sub-title">ACGエッチ画像まとめ</p>
+  <p id="sub-title">全年龄向ACGイラストまとめ</p>
 </header>
 
 <div class="main-wrapper">
   <div class="container">
     <div class="tabs">
-      <div class="tab-item active" id="tab-setu">二次元篇</div>
+      <div class="tab-item active" id="tab-acg">全年龄向</div>
+      <div class="tab-item" id="tab-setu">二次元篇</div>
       <div class="tab-item" id="tab-zrsetu">cos篇</div>
       <div class="tab-slider" id="tabSlider"></div>
     </div>
@@ -266,49 +270,39 @@
 </div>
 
 <script>
-let currentTab = 'setu';
-
-/* ==========================================================================
-   【优化核心】带 1 小时过期机制的页码状态存取函数
-   ========================================================================== */
-const ONE_HOUR = 60 * 60 * 1000; // 1小时的毫秒数
+let currentTab = 'acg'; 
+const ONE_HOUR = 60 * 60 * 1000;
 
 function getSavedPage(tabType) {
   try {
     const dataStr = localStorage.getItem(`setutime_page_data_${tabType}`);
     if (!dataStr) return 1;
-    
     const item = JSON.parse(dataStr);
     const now = new Date().getTime();
-    
-    // 如果当前时间减去最后存入的时间超过了1小时，说明数据失效，重置回第1页
     if (now - item.timestamp > ONE_HOUR) {
       localStorage.removeItem(`setutime_page_data_${tabType}`);
       return 1;
     }
     return parseInt(item.page) || 1;
-  } catch (e) {
-    return 1;
-  }
+  } catch (e) { return 1; }
 }
 
 function savePage(tabType, pageNum) {
-  const item = {
-    page: pageNum,
-    timestamp: new Date().getTime() // 存入当前精确时间戳
-  };
+  const item = { page: pageNum, timestamp: new Date().getTime() };
   localStorage.setItem(`setutime_page_data_${tabType}`, JSON.stringify(item));
 }
 
-// 页面运行时的页码变量通过新函数进行初始化
 let currentPage = { 
+  acg: getSavedPage('acg'),
   setu: getSavedPage('setu'), 
   zrsetu: getSavedPage('zrsetu') 
 };
 
 let cachePages = {}; 
+let allAcgItems = [];
 let allSetuItems = [];
 let allZrsetuItems = [];
+let totalAcgCount = 0;
 let totalSetuCount = 0;
 let totalZrsetuCount = 0;
 
@@ -317,9 +311,6 @@ const SERVER_ITEMS_PER_FILE = 50;
 
 const rootUrl = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost' ? '/' : 'https://setutime.com/';
 
-/* ==========================================================================
-   【新增】深色模式逻辑核心
-   ========================================================================== */
 function toggleDarkMode() {
   const isDark = document.documentElement.classList.toggle('dark-theme');
   localStorage.setItem('setutime_dark_mode', isDark ? 'true' : 'false');
@@ -328,7 +319,7 @@ function toggleDarkMode() {
     if (isDark) {
       metaTheme.setAttribute('content', '#111827');
     } else {
-      metaTheme.setAttribute('content', currentTab === 'zrsetu' ? '#f8b8c8' : '#428cca');
+      metaTheme.setAttribute('content', currentTab === 'setu' ? '#428cca' : (currentTab === 'zrsetu' ? '#f8b8c8' : '#50C878'));
     }
   }
 }
@@ -374,7 +365,17 @@ function handleTabClick(type, index) {
   const subTitle = document.getElementById('sub-title');
   const metaTheme = document.getElementById('meta-theme-color');
   
-  if (type === 'zrsetu') {
+  document.documentElement.classList.remove('blue-theme', 'pink-theme');
+  document.body.classList.remove('blue-theme', 'pink-theme');
+  
+  if (type === 'setu') {
+    document.documentElement.classList.add('blue-theme');
+    document.body.classList.add('blue-theme');
+    mainTitle.innerText = "SetuTime！";
+    subTitle.innerText = "ACGエッチ画像まとめ";
+    slider.style.background = '#428cca';
+    if(metaTheme && !document.documentElement.classList.contains('dark-theme')) metaTheme.setAttribute('content', '#428cca');
+  } else if (type === 'zrsetu') {
     document.documentElement.classList.add('pink-theme');
     document.body.classList.add('pink-theme');
     mainTitle.innerText = "SetuTime！";
@@ -382,12 +383,10 @@ function handleTabClick(type, index) {
     slider.style.background = '#f8b8c8';
     if(metaTheme && !document.documentElement.classList.contains('dark-theme')) metaTheme.setAttribute('content', '#f8b8c8');
   } else {
-    document.documentElement.classList.remove('pink-theme');
-    document.body.classList.remove('pink-theme');
     mainTitle.innerText = "SetuTime！";
-    subTitle.innerText = "ACGエッチ画像まとめ";
-    slider.style.background = '#428cca';
-    if(metaTheme && !document.documentElement.classList.contains('dark-theme')) metaTheme.setAttribute('content', '#428cca');
+    subTitle.innerText = "全年龄向ACGイラストまとめ";
+    slider.style.background = '#50C878';
+    if(metaTheme && !document.documentElement.classList.contains('dark-theme')) metaTheme.setAttribute('content', '#50C878');
   }
   
   renderCurrentList(true);
@@ -401,13 +400,24 @@ function initTabSliderSilent(type) {
   const metaTheme = document.getElementById('meta-theme-color');
   
   slider.style.transition = 'none';
+  document.documentElement.classList.remove('blue-theme', 'pink-theme');
+  document.body.classList.remove('blue-theme', 'pink-theme');
+  items.forEach(el => el.classList.remove('active'));
   
-  if (type === 'zrsetu') {
-    currentTab = 'zrsetu';
-    localStorage.setItem('setutime_active_tab', 'zrsetu');
+  if (type === 'setu') {
+    currentTab = 'setu';
     slider.style.transform = 'translateX(100%)';
-    items[0].classList.remove('active');
     items[1].classList.add('active');
+    document.documentElement.classList.add('blue-theme');
+    document.body.classList.add('blue-theme');
+    mainTitle.innerText = "SetuTime！";
+    subTitle.innerText = "ACGエッチ画像まとめ";
+    slider.style.background = '#428cca';
+    if(metaTheme && !document.documentElement.classList.contains('dark-theme')) metaTheme.setAttribute('content', '#428cca');
+  } else if (type === 'zrsetu') {
+    currentTab = 'zrsetu';
+    slider.style.transform = 'translateX(200%)';
+    items[2].classList.add('active');
     document.documentElement.classList.add('pink-theme');
     document.body.classList.add('pink-theme');
     mainTitle.innerText = "SetuTime！";
@@ -415,17 +425,13 @@ function initTabSliderSilent(type) {
     slider.style.background = '#f8b8c8';
     if(metaTheme && !document.documentElement.classList.contains('dark-theme')) metaTheme.setAttribute('content', '#f8b8c8');
   } else {
-    currentTab = 'setu';
-    localStorage.setItem('setutime_active_tab', 'setu');
+    currentTab = 'acg';
     slider.style.transform = 'translateX(0%)';
-    items[1].classList.remove('active');
     items[0].classList.add('active');
-    document.documentElement.classList.remove('pink-theme');
-    document.body.classList.remove('pink-theme');
     mainTitle.innerText = "SetuTime！";
-    subTitle.innerText = "ACGエッチ画像まとめ";
-    slider.style.background = '#428cca';
-    if(metaTheme && !document.documentElement.classList.contains('dark-theme')) metaTheme.setAttribute('content', '#428cca');
+    subTitle.innerText = "全年龄向ACGイラストまとめ";
+    slider.style.background = '#50C878';
+    if(metaTheme && !document.documentElement.classList.contains('dark-theme')) metaTheme.setAttribute('content', '#50C878');
   }
   
   slider.offsetHeight; 
@@ -444,7 +450,7 @@ async function renderCurrentList(isTabSwitch = false) {
   }
   
   const activePage = currentPage[currentTab];
-  const totalCount = currentTab === 'setu' ? totalSetuCount : totalZrsetuCount;
+  const totalCount = currentTab === 'acg' ? totalAcgCount : (currentTab === 'setu' ? totalSetuCount : totalZrsetuCount);
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE) || 1;
   
   const startIdx = (activePage - 1) * ITEMS_PER_PAGE;
@@ -459,6 +465,11 @@ async function renderCurrentList(isTabSwitch = false) {
       const pageData = await fetchJson(`${rootUrl}data_pages/${p}.json`);
       if (pageData) {
         cachePages[p] = pageData;
+        if (pageData.acg) {
+          pageData.acg.forEach(item => {
+            if (!allAcgItems.some(x => x.file === item.file)) allAcgItems.push(item);
+          });
+        }
         if (pageData.setu) {
           pageData.setu.forEach(item => {
             if (!allSetuItems.some(x => x.file === item.file)) allSetuItems.push(item);
@@ -474,7 +485,7 @@ async function renderCurrentList(isTabSwitch = false) {
   }
   
   listDiv.style.opacity = '1';
-  const currentPool = currentTab === 'setu' ? allSetuItems : allZrsetuItems;
+  const currentPool = currentTab === 'acg' ? allAcgItems : (currentTab === 'setu' ? allSetuItems : allZrsetuItems);
   
   currentPool.sort((a, b) => {
     const numA = parseInt(a.file.match(/\d+/)?.[0] || 0);
@@ -521,7 +532,7 @@ async function renderCurrentList(isTabSwitch = false) {
 }
 
 function handleInputJump(val) {
-  const totalCount = currentTab === 'setu' ? totalSetuCount : totalZrsetuCount;
+  const totalCount = currentTab === 'acg' ? totalAcgCount : (currentTab === 'setu' ? totalSetuCount : totalZrsetuCount);
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE) || 1;
   let pageNum = parseInt(val);
   
@@ -538,20 +549,20 @@ function handleInputJump(val) {
   }
   
   currentPage[currentTab] = pageNum;
-  savePage(currentTab, pageNum); // 使用带时间戳的存储函数
+  savePage(currentTab, pageNum);
   renderCurrentList();
 }
 
 function changePage(direction) {
   const activePage = currentPage[currentTab];
-  const totalCount = currentTab === 'setu' ? totalSetuCount : totalZrsetuCount;
+  const totalCount = currentTab === 'acg' ? totalAcgCount : (currentTab === 'setu' ? totalSetuCount : totalZrsetuCount);
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE) || 1;
   
   const newPage = activePage + direction;
   if (newPage < 1 || newPage > totalPages) return;
   
   currentPage[currentTab] = newPage;
-  savePage(currentTab, newPage); // 使用带时间戳的存储函数
+  savePage(currentTab, newPage);
   renderCurrentList();
 }
 
@@ -576,6 +587,11 @@ async function preloadAllSearchData() {
       if (!data) break;
       cachePages[p] = data;
       
+      if (data.acg) {
+        data.acg.forEach(item => {
+          if (!allAcgItems.some(x => x.file === item.file)) allAcgItems.push(item);
+        });
+      }
       if (data.setu) {
         data.setu.forEach(item => {
           if (!allSetuItems.some(x => x.file === item.file)) allSetuItems.push(item);
@@ -596,7 +612,7 @@ function doSearch() {
   const resultsDiv = document.getElementById('searchResults');
   if (!val) { resultsDiv.innerHTML = ''; return; }
   
-  const currentPool = currentTab === 'setu' ? allSetuItems : allZrsetuItems;
+  const currentPool = currentTab === 'acg' ? allAcgItems : (currentTab === 'setu' ? allSetuItems : allZrsetuItems);
   const matched = currentPool.filter(item => {
     const isCaptionMatch = item.caption && item.caption.toLowerCase().includes(val);
     const issueNum = item.file.match(/\d+/)?.[0] || '';
@@ -618,23 +634,21 @@ window.onkeydown = (e) => {
 };
 
 function initTouchEvents() {
+  const tabAcg = document.getElementById('tab-acg');
   const tabSetu = document.getElementById('tab-setu');
   const tabZrsetu = document.getElementById('tab-zrsetu');
-  const bindEvent = (el, type, index) => {
-    el.addEventListener('click', (e) => { e.preventDefault(); handleTabClick(type, index); });
-  };
-  bindEvent(tabSetu, 'setu', 0);
-  bindEvent(tabZrsetu, 'zrsetu', 1);
+  
+  tabAcg.addEventListener('click', (e) => { e.preventDefault(); handleTabClick('acg', 0); });
+  tabSetu.addEventListener('click', (e) => { e.preventDefault(); handleTabClick('setu', 1); });
+  tabZrsetu.addEventListener('click', (e) => { e.preventDefault(); handleTabClick('zrsetu', 2); });
 }
 
 async function startAppNow() {
   initTouchEvents();
   
-  // 1. 初始化用户上次保存的 Tab 配色，确保进度条出现之前底色正确
-  const savedTab = localStorage.getItem('setutime_active_tab') || 'setu';
+  const savedTab = localStorage.getItem('setutime_active_tab') || 'acg';
   initTabSliderSilent(savedTab);
   
-  // 2. 模拟真实进度：开始发起 API 之前将进度条推送到 35%
   const pBar = document.getElementById('topProgressBar');
   if (pBar) pBar.style.width = '35%';
   
@@ -645,33 +659,31 @@ async function startAppNow() {
     return;
   }
   
-  // 3. API 返回后推送到 70%
   if (pBar) pBar.style.width = '70%';
   
   const getCount = arr => (arr && arr.length > 0) ? (parseInt(arr[0].file) || arr.length) : 0;
+  totalAcgCount = getCount(globalData.acg);
   totalSetuCount = getCount(globalData.setu);
   totalZrsetuCount = getCount(globalData.zrsetu);
   
+  allAcgItems = (globalData.acg || []);
   allSetuItems = (globalData.setu || []);
   allZrsetuItems = (globalData.zrsetu || []);
   
+  const maxAcgPages = Math.ceil(totalAcgCount / ITEMS_PER_PAGE) || 1;
   const maxSetuPages = Math.ceil(totalSetuCount / ITEMS_PER_PAGE) || 1;
   const maxZrsetuPages = Math.ceil(totalZrsetuCount / ITEMS_PER_PAGE) || 1;
+  if (currentPage.acg > maxAcgPages) currentPage.acg = maxAcgPages;
   if (currentPage.setu > maxSetuPages) currentPage.setu = maxSetuPages;
   if (currentPage.zrsetu > maxZrsetuPages) currentPage.zrsetu = maxZrsetuPages;
   
-  // 4. 首次渲染完首屏
   await renderCurrentList();
   
-  // 5. 【核心释放】数据和节点全部整备完毕：进度条拉满 100%，大标题移除呼吸样式
   if (pBar) {
     pBar.style.width = '100%';
-    setTimeout(() => {
-      pBar.style.opacity = '0'; // 优雅淡出
-    }, 200);
+    setTimeout(() => { pBar.style.opacity = '0'; }, 200);
   }
   
-  // 移除大标题的加载态呼吸动效，并缓动平滑升起下方框架
   const headerEl = document.getElementById('appHeader');
   if (headerEl) headerEl.classList.remove('app-loading');
   
