@@ -105,7 +105,7 @@
   
   .item-left { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 0; text-align: left; padding-right: 12px; }
   .item-title { font-size: 16px; font-weight: 600; color: #111827; white-space: nowrap; }
-  .item-sub { font-size: 13px !important; color: #6b7280 !important; line-height: 1.5 !important; white-space: normal !important; word-break: break-all !important; overflow: visible !important; }
+  .item-sub { font-size: 13px !important; color: #6b7280 !important; line-height: 1.5 !important; white-space: normal !important; word-break: break-all !important; overflow: visible !important; flex: 1; }
   
   .item-btn { background: #f3f4f6; color: #4b5563; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; transition: all 0.25s; flex-shrink: 0; user-select: none; }
   ul.list li:hover .item-btn { background: #428cca; color: #ffffff; }
@@ -309,7 +309,8 @@ let totalZrsetuCount = 0;
 const ITEMS_PER_PAGE = 10;
 const SERVER_ITEMS_PER_FILE = 50;
 
-const rootUrl = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost' ? '/' : 'https://setutime.com/';
+// 【核心修改点】完美兼容 index.setutime.com 等任意子域名的动态路径获取机制[cite: 2]
+const rootUrl = `${window.location.protocol}//${window.location.host}/`;
 
 function toggleDarkMode() {
   const isDark = document.documentElement.classList.toggle('dark-theme');
@@ -499,8 +500,9 @@ async function renderCurrentList(isTabSwitch = false) {
   if (pageItems.length === 0) {
     listDiv.innerHTML = `<div style="text-align:center;padding:40px;color:#9ca3af;font-weight:600;width:100%;">暂无当前页数据</div>`;
   } else {
+    // 【细节修改点】去掉了 window.open 写死的域名前缀，改为根路径跳转，彻底避免点击项强跳回主站的问题
     listDiv.innerHTML = pageItems.map(item => `
-      <li onclick="window.open('${rootUrl}${currentTab}/${item.file}', '_self')">
+      <li onclick="window.open('/${currentTab}/${item.file}', '_self')">
         <div class="item-left">
           <div class="item-title">第 ${item.file.match(/\d+/)?.[0] || '?'} 期</div>
           <div class="item-sub">${item.caption || '精选合集发布'}</div>
@@ -621,8 +623,9 @@ function doSearch() {
     return isCaptionMatch || isNumMatch;
   });
   
+  // 【细节修改点】搜索结果列表的 window.open 同步去掉写死的域名前缀
   resultsDiv.innerHTML = matched.map(item => `
-    <div class="item" onclick="window.open('${rootUrl}${currentTab}/${item.file}', '_self')">
+    <div class="item" onclick="window.open('/${currentTab}/${item.file}', '_self')">
       <div class="title">第 ${item.file.match(/\d+/)?.[0] || '?'} 期</div>
       <div class="sub">${item.caption || '完整合集'}</div>
     </div>
