@@ -357,7 +357,6 @@ document.addEventListener("DOMContentLoaded", function() {
             const img = new Image();
             img.timeout = 1500; // 超时阀值设为 1.5 秒
             
-            // 请求 R2 上必须存在且容量最小的资源作为连通探测（加上随机数防止强缓存干扰）
             img.src = "https://r2.setutime.com/favicon.ico?t=" + new Date().getTime(); 
             
             img.onload = () => resolve(true);
@@ -368,17 +367,22 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // === 3. 业务链路分流及路径重组 ===
     checkR2Connectivity().then(isR2Available => {
-        // 唯有 R2 互通完好且提取出合法期号时，才采用重写的 R2 路径布局
+        const imgs = document.querySelectorAll('.img-wrap img');
+
         if (isR2Available && currentNo !== null) {
             useR2 = true;
             console.log(`[🟢 状态] R2 直连良好，已无缝切换至 R2 托管线。期号: ${currentNo}`);
+            
+            // 核心修复：一旦 R2 畅通，立即提前重写所有图片的 data-src 路由缓存
+            imgs.forEach((img, i) => {
+                const index = i + 1;
+                img.dataset.src = `https://r2.setutime.com/zrsetu_pic/pic-${currentNo}-${index}.webp`;
+            });
         } else {
             console.warn("[⚠️ 状态] R2 直连失败或未读到期号，切换为原图默认 wdcdn.qpic.cn 直连");
         }
 
-        // 锁定所有的图片DOM节点集合
-        const imgs = document.querySelectorAll('.img-wrap img');
-
+        // === 4. 执行懒加载监听 ===
         if ('IntersectionObserver' in window) {
             const imageObserver = new IntersectionObserver((entries, observer) => {
                 entries.forEach(entry => {
@@ -386,15 +390,8 @@ document.addEventListener("DOMContentLoaded", function() {
                         const img = entry.target;
                         const wrap = img.parentElement;
                         
-                        // 核心逻辑：获取当前图片在图片列表里的实时物理索引号（1-based 序号）
-                        const index = Array.from(imgs).indexOf(img) + 1;
-                        
+                        // 此时获取到的 targetSrc 已经是上面第3步决定好的最终路由（R2 或 wdcdn）
                         let targetSrc = img.dataset.src;
-
-                        // 如果 R2 可行，重构拼接为标准 WebP 结构路径
-                        if (useR2) {
-                            targetSrc = `https://r2.setutime.com/zrsetu_pic/pic-${currentNo}-${index}.webp`;
-                        }
 
                         if (targetSrc) {
                             img.src = targetSrc;
@@ -408,19 +405,14 @@ document.addEventListener("DOMContentLoaded", function() {
             imgs.forEach(img => imageObserver.observe(img));
         } else {
             // 低版本浏览器兜底加载
-            imgs.forEach((img, i) => {
-                const index = i + 1;
-                let targetSrc = img.dataset.src;
-                if (useR2) {
-                    targetSrc = `https://r2.setutime.com/zrsetu_pic/pic-${currentNo}-${index}.webp`;
-                }
-                img.src = targetSrc;
+            imgs.forEach((img) => {
+                img.src = img.dataset.src;
                 img.onload = () => img.parentElement.classList.add('loaded');
             });
         }
     });
 
-    // === 4. 你原有的导航和按钮功能（逻辑微调闭环） ===
+    // === 5. 你原有的导航和按钮功能 ===
     if (currentNo !== null) {
         const prevNo = currentNo - 1;
         const prevLink = document.getElementById('prev-link');
@@ -434,7 +426,7 @@ document.addEventListener("DOMContentLoaded", function() {
         if (bottomSaveBtn) { bottomSaveBtn.href = downloadUrl; }
     }
 
-    // === 5. 悬浮按钮滚动动效处理 ===
+    // === 6. 悬浮按钮滚动动效处理 ===
     const fixedBtn = document.querySelector('.fixed-button');
     let lastScrollY = window.scrollY;
     let ticking = false;
