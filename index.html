@@ -378,21 +378,21 @@ function handleTabClick(type, index) {
   document.body.classList.remove('blue-theme', 'pink-theme', 'green-theme');
   
   if (type === 'setu') {
-    mainTitle.innerText = "SetuTime！";
+    mainTitle.innerText = "SetuTime~";
     subTitle.innerText = "ACGエッチ画像まとめ";
     slider.style.background = '#428cca';
     if(metaTheme && !document.documentElement.classList.contains('dark-theme')) metaTheme.setAttribute('content', '#428cca');
   } else if (type === 'zrsetu') {
     document.documentElement.classList.add('pink-theme');
     document.body.classList.add('pink-theme');
-    mainTitle.innerText = "SetuTime！";
+    mainTitle.innerText = "SetuTime~";
     subTitle.innerText = "Cosplayエッチ画像まとめ";
     slider.style.background = '#f8b8c8';
     if(metaTheme && !document.documentElement.classList.contains('dark-theme')) metaTheme.setAttribute('content', '#f8b8c8');
   } else {
     document.documentElement.classList.add('green-theme');
     document.body.classList.add('green-theme');
-    mainTitle.innerText = "SetuTime！";
+    mainTitle.innerText = "SetuTime~";
     subTitle.innerText = "全年龄向ACGイラストまとめ";
     slider.style.background = '#50C878';
     if(metaTheme && !document.documentElement.classList.contains('dark-theme')) metaTheme.setAttribute('content', '#50C878');
