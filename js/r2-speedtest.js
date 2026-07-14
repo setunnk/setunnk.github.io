@@ -39,11 +39,11 @@ document.addEventListener("DOMContentLoaded", function() {
                 controller.abort();
                 resolve(false);
             }, 1500); // 1.5秒超时
-
-            fetch(`https://r2.setutime.com/zrsetu/video-${currentNo}-1.mp4`, {
-                method: 'HEAD',
-                mode: 'cors',
-                signal: controller.signal
+            // 改成一个绝对存在的固定文件，不要用动态的 currentNo
+            fetch(`https://r2.setutime.com/ping.txt`, {
+               method: 'HEAD',
+               mode: 'cors',
+               signal: controller.signal
             })
             .then(response => {
                 clearTimeout(timeoutId);
