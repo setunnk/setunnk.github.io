@@ -6,6 +6,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" id="meta-theme-color" content="#428cca"> <!-- 默认修改为二次元晴空蓝 -->
+<link rel="stylesheet" href="https://cdn.jsdmirror.com/gh/FrecklyComb1728/blog@main/public/fonts/xiaolai.css">
 <link rel="icon" href="https://wdcdn.qpic.cn/MTMxMDI2NjEwNzAzNzc4NzY_582527_m5n34EQ_C6U8f2WE_1782832113" type="image/png">
 <meta name="description" content="点击前往SetuTime~">
 <title>SetuTime！</title>
@@ -75,8 +76,15 @@
   .loaded ul.list li.show { opacity: 1; transform: translateY(0); }
   
   header { background: transparent; color: #ffffff; padding: 40px 20px 20px; text-align: center; position: relative; }
-  header h1 { margin: 0; font-size: 32px; font-weight: 700; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-  header p { margin: 8px 0 0; opacity: 0.9; font-size: 15px; font-weight: 400; }
+  header h1 { margin: 0; font-size: 40px; font-weight: 700; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+  header p { 
+    margin: 8px 0 0; 
+    opacity: 0.9; 
+    font-size: 20px; /* 适当调大一点字号，让手写卡通字更显眼 */
+    font-weight: 400; 
+    font-family: 'xiaolai', -apple-system, BlinkMacSystemFont, sans-serif; /* 使用一模一样的小濑字体 */
+    letter-spacing: 0.5px; 
+  }
   
   .main-wrapper {
     background: #ffffff;
