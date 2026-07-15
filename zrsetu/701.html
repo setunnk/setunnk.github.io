@@ -660,25 +660,18 @@ document.addEventListener("DOMContentLoaded", function() {
     if ('IntersectionObserver' in window) {
         const imageObserver = new IntersectionObserver((entries, observer) => {
             entries.forEach(entry => {
-                const img = entry.target;
-                const wrap = img.parentElement;
                 if (entry.isIntersecting) {
-                    if (!img.src || img.src !== img.dataset.src) {
+                    const img = entry.target;
+                    const wrap = img.parentElement;
+                    if (img.dataset.src) {
                         img.src = img.dataset.src;
-                        img.onload = () => { 
-                            wrap.classList.add('loaded'); 
-                        };
+                        img.onload = () => { wrap.classList.add('loaded'); };
                     }
-                } else {
-                    if (img.src && img.src !== "") {
-                        img.removeAttribute('src');
-                        wrap.classList.remove('loaded');
-                    }
+                    observer.unobserve(img);
                 }
             });
-        }, { 
-            rootMargin: "5000px 0px 5000px 0px" 
-        });
+        }, { rootMargin: "0px 0px 300px 0px" });
+
         const imgs = document.querySelectorAll('.img-wrap img');
         imgs.forEach(img => imageObserver.observe(img));
     } else {
@@ -696,22 +689,25 @@ document.addEventListener("DOMContentLoaded", function() {
             const prevNo = currentNo - 1;
             const prevLink = document.getElementById('prev-link');
             if (prevLink) {
-                prevLink.href = `https://setutime.com/zrsetu/\prevNo`;
+                prevLink.href = `https://setutime.com/zrsetu/${prevNo}`;
             }
-            const downloadUrl = `https://dl.setutime.com/support?id=zrsetu_\currentNo`;
+            const downloadUrl = `https://dl.setutime.com/support?id=zrsetu_${currentNo}`;
             const topSaveBtn = document.querySelector('.save-blue');
             if (topSaveBtn) {
                 topSaveBtn.href = downloadUrl;
             }
-            const preserveBtn = document.querySelector('.preserve');
-            if (preserveBtn) {
-                preserveBtn.href = downloadUrl;
+            const bottomSaveBtn = document.querySelector('.preserve');
+            if (bottomSaveBtn) {
+                bottomSaveBtn.href = downloadUrl;
             }
         }
     }
+
+
     const fixedBtn = document.querySelector('.fixed-button');
     let lastScrollY = window.scrollY;
     let ticking = false;
+
     function updateButtonVisibility() {
         const currentScrollY = window.scrollY;
         if (currentScrollY > lastScrollY && currentScrollY > 10) {
@@ -722,6 +718,7 @@ document.addEventListener("DOMContentLoaded", function() {
         lastScrollY = currentScrollY;
         ticking = false;
     }
+
     window.addEventListener('scroll', () => {
         if (!ticking) {
             window.requestAnimationFrame(updateButtonVisibility);
