@@ -662,7 +662,6 @@ document.addEventListener("DOMContentLoaded", function() {
             entries.forEach(entry => {
                 const img = entry.target;
                 const wrap = img.parentElement;
-                
                 if (entry.isIntersecting) {
                     if (!img.src || img.src !== img.dataset.src) {
                         img.src = img.dataset.src;
@@ -678,12 +677,10 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             });
         }, { 
-            rootMargin: "1000px 0px 1000px 0px" 
+            rootMargin: "5000px 0px 5000px 0px" 
         });
-
         const imgs = document.querySelectorAll('.img-wrap img');
         imgs.forEach(img => imageObserver.observe(img));
-        
     } else {
         const imgs = document.querySelectorAll('.img-wrap img');
         imgs.forEach(img => {
@@ -691,7 +688,6 @@ document.addEventListener("DOMContentLoaded", function() {
             img.onload = () => img.parentElement.classList.add('loaded');
         });
     }
-
     const titleEl = document.querySelector('.title');
     if (titleEl) {
         const match = titleEl.innerText.match(/\d+/);
@@ -700,9 +696,9 @@ document.addEventListener("DOMContentLoaded", function() {
             const prevNo = currentNo - 1;
             const prevLink = document.getElementById('prev-link');
             if (prevLink) {
-                prevLink.href = `https://setutime.com/zrsetu/${prevNo}`; //[cite: 1]
+                prevLink.href = `https://setutime.com/zrsetu/\prevNo`;
             }
-            const downloadUrl = `https://dl.setutime.com/support?id=zrsetu_${currentNo}`;
+            const downloadUrl = `https://dl.setutime.com/support?id=zrsetu_\currentNo`;
             const topSaveBtn = document.querySelector('.save-blue');
             if (topSaveBtn) {
                 topSaveBtn.href = downloadUrl;
@@ -713,6 +709,25 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         }
     }
+    const fixedBtn = document.querySelector('.fixed-button');
+    let lastScrollY = window.scrollY;
+    let ticking = false;
+    function updateButtonVisibility() {
+        const currentScrollY = window.scrollY;
+        if (currentScrollY > lastScrollY && currentScrollY > 10) {
+            fixedBtn.classList.add('hidden');
+        } else {
+            fixedBtn.classList.remove('hidden');
+        }
+        lastScrollY = currentScrollY;
+        ticking = false;
+    }
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            window.requestAnimationFrame(updateButtonVisibility);
+            ticking = true;
+        }
+    });
 });
 </script>
 </body>
