@@ -12,17 +12,27 @@ document.addEventListener("DOMContentLoaded", function() {
         if (match) {
             currentNo = parseInt(match[0]);
             
-            // 动态适配前一期链接的目录名前缀（根据当前页面 URL 自动匹配）
+            // 动态适配前一期链接的目录名前缀与下载页 ID 前缀（根据当前页面 URL 自动匹配）
             const currentPathname = window.location.pathname;
             let folderPrefix = "/zrsetu";
-            if (currentPathname.startsWith("/setu")) folderPrefix = "/setu";
-            if (currentPathname.startsWith("/acg")) folderPrefix = "/acg";
+            let kvPrefix = "zrsetu"; // 动态匹配 KV 里的前缀类型
 
+            if (currentPathname.startsWith("/setu")) {
+                folderPrefix = "/setu";
+                kvPrefix = "setu";
+            } else if (currentPathname.startsWith("/acg")) {
+                folderPrefix = "/acg";
+                kvPrefix = "acg";
+            }
+
+            // 重写下一期/前一期链接
             const prevNo = currentNo - 1;
             const prevLink = document.getElementById('prev-link');
             if (prevLink) prevLink.href = `https://setutime.com${folderPrefix}/${prevNo}`;
             
-            const downloadUrl = `https://dl.setutime.com/support?id=zrsetu_${currentNo}`;
+            // 【核心修复】将原先写死的 zrsetu_ 改为动态的 ${kvPrefix}_
+            const downloadUrl = `https://dl.setutime.com/support?id=${kvPrefix}_${currentNo}`;
+            
             const topSaveBtn = document.querySelector('.save-blue');
             if (topSaveBtn) topSaveBtn.href = downloadUrl;
             
@@ -39,7 +49,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 controller.abort();
                 resolve(false);
             }, 1500); // 1.5秒超时
-            // 改成一个绝对存在的固定文件，不要用动态的 currentNo
+            
             fetch(`https://r2.setutime.com/ping.txt`, {
                method: 'HEAD',
                mode: 'cors',
@@ -69,7 +79,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 if (originalSrc && originalSrc.includes('wdcdn.qpic.cn')) {
                     const index = img.getAttribute('alt');
                     if (index) {
-                        // 【核心改动】这里的 r2Dir 是动态的，会自动变成 zrsetu_pic / setu_pic / acg_pic
+                        // 这里的 r2Dir 是动态的，会自动变成 zrsetu_pic / setu_pic / acg_pic
                         img.dataset.src = `https://r2.setutime.com/${r2Dir}/pic-${currentNo}-${index}.webp`;
                     }
                 }
