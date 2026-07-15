@@ -16,6 +16,12 @@ document.addEventListener("DOMContentLoaded", function() {
     // 2. 检查是否具备 R2 替换的基本条件（必须同时拥有解析出的期号与 R2 目录名）
     const canUseR2 = currentNo !== null && r2Dir !== null;
 
+    // 如果基础配置不满足，直接什么都不做
+    if (!canUseR2) {
+        console.log("未读取到期号或R2配置目录，直接保持页面默认图床加载模式");
+        return;
+    }
+
     // 3. 网络探测函数：测试是否能连通 R2 域名
     function checkR2Connectivity() {
         return new Promise((resolve) => {
@@ -56,7 +62,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
                     let timeoutId = setTimeout(() => {
                         if (!img.complete) {
-                            console.warn(`[R2] 图片加载超时 (超出 5 秒)，正在回退到默认地址: ${img.alt}`);
+                            console.warn(`[R2] 图片加载超时 (超出 5 秒)，正在回退到页面默认地址: ${img.alt}`);
                             rollback();
                         }
                     }, 5000); // 5秒超时设定
@@ -74,7 +80,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     };
 
                     const onError = () => {
-                        console.warn(`[R2] 图片加载失败，已回退到默认地址: ${img.alt}`);
+                        console.warn(`[R2] 图片加载失败，已回退到页面默认地址: ${img.alt}`);
                         rollback();
                     };
 
@@ -92,43 +98,41 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     // 5. 后台静默检测与升级
-    if (canUseR2) {
-        checkR2Connectivity().then(isR2Available => {
-            console.log(`R2 连通性测试结果: ${isR2Available}, 动态目录: ${r2Dir}`);
+    checkR2Connectivity().then(isR2Available => {
+        console.log(`R2 连通性测试结果: ${isR2Available}, 动态目录: ${r2Dir}`);
+        
+        // 如果 R2 测试不可用，直接退出，什么都不做，继续使用页面默认的新图床
+        if (!isR2Available) {
+            return;
+        }
+        
+        const imgs = document.querySelectorAll('.img-wrap img');
+        imgs.forEach(img => {
+            const originalSrc = img.dataset.src || img.src;
             
-            if (isR2Available) {
-                const imgs = document.querySelectorAll('.img-wrap img');
-                imgs.forEach(img => {
-                    const originalSrc = img.dataset.src || img.src;
+            if (originalSrc) {
+                const index = img.getAttribute('alt');
+                if (index) {
+                    const r2Url = `https://r2.setutime.com/${r2Dir}/pic-${currentNo}-${index}.webp`;
                     
-                    // 如果当前还是默认的腾讯云链接，则准备替换为 R2 链接
-                    if (originalSrc && originalSrc.includes('wdcdn.qpic.cn')) {
-                        const index = img.getAttribute('alt');
-                        if (index) {
-                            const r2Url = `https://r2.setutime.com/${r2Dir}/pic-${currentNo}-${index}.webp`;
-                            
-                            // 备份默认地址与 R2 目标地址到 dataset 中
-                            img.dataset.originalSrc = originalSrc;
-                            img.dataset.r2Target = r2Url;
+                    // 备份默认的新图床地址与 R2 目标地址到 dataset 中
+                    img.dataset.originalSrc = originalSrc;
+                    img.dataset.r2Target = r2Url;
 
-                            // 启动属性监听器（无论是现在立刻加载还是等懒加载触发，都能被捕获）
-                            imgObserver.observe(img, { attributes: true, attributeFilter: ['src'] });
-                            
-                            // 更新 data-src 确保还未滚动到的图片在进入可视区时请求 R2 源
-                            img.dataset.src = r2Url; 
-                            
-                            // 如果该图已经滚动到可视区并加载完成了，无缝将其 src 替换为高清 R2 链接
-                            if (img.src && img.src.includes('wdcdn.qpic.cn')) {
-                                img.src = r2Url;
-                            }
-                        }
+                    // 启动属性监听器（无论是现在立刻加载还是等懒加载触发，都能被捕获）
+                    imgObserver.observe(img, { attributes: true, attributeFilter: ['src'] });
+                    
+                    // 更新 data-src 确保还未滚动到的图片在进入可视区时请求 R2 源
+                    img.dataset.src = r2Url; 
+                    
+                    // 如果该图已经滚动到可视区并已经触发了初始加载，无缝将其 src 替换为 R2 链接
+                    if (img.src && img.src === originalSrc) {
+                        img.src = r2Url;
                     }
-                });
+                }
             }
-        }).catch(err => {
-            console.log("R2 检测发生异常，已保持模板默认的 wdcdn 加载模式", err);
         });
-    } else {
-        console.log("未读取到期号或R2配置目录，直接保持默认的腾讯云 wdcdn 加载模式");
-    }
+    }).catch(err => {
+        console.log("R2 检测发生异常，直接保持页面默认加载模式", err);
+    });
 });
