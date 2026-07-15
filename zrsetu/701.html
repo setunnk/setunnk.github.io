@@ -660,20 +660,30 @@ document.addEventListener("DOMContentLoaded", function() {
     if ('IntersectionObserver' in window) {
         const imageObserver = new IntersectionObserver((entries, observer) => {
             entries.forEach(entry => {
+                const img = entry.target;
+                const wrap = img.parentElement;
+                
                 if (entry.isIntersecting) {
-                    const img = entry.target;
-                    const wrap = img.parentElement;
-                    if (img.dataset.src) {
+                    if (!img.src || img.src !== img.dataset.src) {
                         img.src = img.dataset.src;
-                        img.onload = () => { wrap.classList.add('loaded'); };
+                        img.onload = () => { 
+                            wrap.classList.add('loaded'); 
+                        };
                     }
-                    observer.unobserve(img);
+                } else {
+                    if (img.src && img.src !== "") {
+                        img.removeAttribute('src');
+                        wrap.classList.remove('loaded');
+                    }
                 }
             });
-        }, { rootMargin: "0px 0px 300px 0px" });
+        }, { 
+            rootMargin: "1000px 0px 1000px 0px" 
+        });
 
         const imgs = document.querySelectorAll('.img-wrap img');
         imgs.forEach(img => imageObserver.observe(img));
+        
     } else {
         const imgs = document.querySelectorAll('.img-wrap img');
         imgs.forEach(img => {
@@ -681,6 +691,7 @@ document.addEventListener("DOMContentLoaded", function() {
             img.onload = () => img.parentElement.classList.add('loaded');
         });
     }
+
     const titleEl = document.querySelector('.title');
     if (titleEl) {
         const match = titleEl.innerText.match(/\d+/);
@@ -689,42 +700,19 @@ document.addEventListener("DOMContentLoaded", function() {
             const prevNo = currentNo - 1;
             const prevLink = document.getElementById('prev-link');
             if (prevLink) {
-                prevLink.href = `https://setutime.com/zrsetu/${prevNo}`;
+                prevLink.href = `https://setutime.com/zrsetu/${prevNo}`; //[cite: 1]
             }
             const downloadUrl = `https://dl.setutime.com/support?id=zrsetu_${currentNo}`;
             const topSaveBtn = document.querySelector('.save-blue');
             if (topSaveBtn) {
                 topSaveBtn.href = downloadUrl;
             }
-            const bottomSaveBtn = document.querySelector('.preserve');
-            if (bottomSaveBtn) {
-                bottomSaveBtn.href = downloadUrl;
+            const preserveBtn = document.querySelector('.preserve');
+            if (preserveBtn) {
+                preserveBtn.href = downloadUrl;
             }
         }
     }
-
-
-    const fixedBtn = document.querySelector('.fixed-button');
-    let lastScrollY = window.scrollY;
-    let ticking = false;
-
-    function updateButtonVisibility() {
-        const currentScrollY = window.scrollY;
-        if (currentScrollY > lastScrollY && currentScrollY > 10) {
-            fixedBtn.classList.add('hidden');
-        } else {
-            fixedBtn.classList.remove('hidden');
-        }
-        lastScrollY = currentScrollY;
-        ticking = false;
-    }
-
-    window.addEventListener('scroll', () => {
-        if (!ticking) {
-            window.requestAnimationFrame(updateButtonVisibility);
-            ticking = true;
-        }
-    });
 });
 </script>
 </body>
