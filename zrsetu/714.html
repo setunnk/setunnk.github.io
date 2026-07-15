@@ -684,9 +684,9 @@ document.addEventListener("DOMContentLoaded", function() {
             const prevNo = currentNo - 1;
             const prevLink = document.getElementById('prev-link');
             if (prevLink) {
-                prevLink.href = `https://setutime.com/zrsetu/\prevNo`;
+                prevLink.href = `https://setutime.com/zrsetu/${prevNo}`;[cite: 1]
             }
-            const downloadUrl = `https://dl.setutime.com/support?id=zrsetu_\currentNo`;
+            const downloadUrl = `https://dl.setutime.com/support?id=zrsetu_${currentNo}`;
             const topSaveBtn = document.querySelector('.save-blue');
             if (topSaveBtn) {
                 topSaveBtn.href = downloadUrl;
