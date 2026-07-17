@@ -508,9 +508,9 @@ async function renderCurrentList(isTabSwitch = false) {
   if (pageItems.length === 0) {
     listDiv.innerHTML = `<div style="text-align:center;padding:40px;color:#9ca3af;font-weight:600;width:100%;">暂无当前页数据</div>`;
   } else {
-    // 【已修复】在路径结尾处手动追加了确切的 .html 后缀，以直接命中服务器文件，杜绝 308 重定向
+    // 【细节修改点】去掉了 window.open 写死的域名前缀，改为根路径跳转，彻底避免点击项强跳回主站的问题
     listDiv.innerHTML = pageItems.map(item => `
-      <li onclick="window.open('/${currentTab}/${item.file}.html', '_self')">
+      <li onclick="window.open('/${currentTab}/${item.file}', '_self')">
         <div class="item-left">
           <div class="item-title">第 ${item.file.match(/\d+/)?.[0] || '?'} 期</div>
           <div class="item-sub">${item.caption || '精选合集发布'}</div>
@@ -631,9 +631,9 @@ function doSearch() {
     return isCaptionMatch || isNumMatch;
   });
   
-  // 【已修复】搜索结果的列表卡片同步补全了相应的 .html 后缀
+  // 【细节修改点】搜索结果列表的 window.open 同步去掉写死的域名前缀
   resultsDiv.innerHTML = matched.map(item => `
-    <div class="item" onclick="window.open('/${currentTab}/${item.file}.html', '_self')">
+    <div class="item" onclick="window.open('/${currentTab}/${item.file}', '_self')">
       <div class="title">第 ${item.file.match(/\d+/)?.[0] || '?'} 期</div>
       <div class="sub">${item.caption || '完整合集'}</div>
     </div>
