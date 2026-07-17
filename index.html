@@ -80,9 +80,9 @@
   header p { 
     margin: 8px 0 0; 
     opacity: 0.9; 
-    font-size: 18px; /* 适当调大一点字号，让手写卡通字更显眼 */
+    font-size: 18px; 
     font-weight: 400; 
-    font-family: 'xiaolai', -apple-system, BlinkMacSystemFont, sans-serif; /* 使用一模一样的小濑字体 */
+    font-family: 'xiaolai', -apple-system, BlinkMacSystemFont, sans-serif; 
     letter-spacing: 0.5px; 
   }
   
@@ -231,7 +231,7 @@
   <div class="container">
     <div class="tabs">
       <div class="tab-item" id="tab-acg">全年龄向</div>
-      <div class="tab-item active" id="tab-setu">二次元篇</div> <!-- 默认激活中间的二次元 -->
+      <div class="tab-item active" id="tab-setu">二次元篇</div> 
       <div class="tab-item" id="tab-zrsetu">cos篇</div>
       <div class="tab-slider" id="tabSlider"></div>
     </div>
@@ -278,7 +278,7 @@
 </div>
 
 <script>
-let currentTab = 'setu'; // 默认改为 setu 
+let currentTab = 'setu'; 
 const ONE_HOUR = 60 * 60 * 1000;
 
 function getSavedPage(tabType) {
@@ -317,8 +317,19 @@ let totalZrsetuCount = 0;
 const ITEMS_PER_PAGE = 10;
 const SERVER_ITEMS_PER_FILE = 50;
 
-// 【核心修改点】完美兼容 index.setutime.com 等任意子域名的动态路径获取机制[cite: 2]
 const rootUrl = `${window.location.protocol}//${window.location.host}/`;
+
+// 【修正点】数据已自带 .html 后缀，此逻辑保持绝对安全的单次拼接，避免重复
+function getTargetUrl(file) {
+  if (!file) return '#';
+  return `/${currentTab}/${file}`;
+}
+
+// 【修正点】从 "719.html" 中精准抽离纯数字期号，免除标题内其他数字干扰
+function getIssueNumber(file) {
+  if (!file) return '?';
+  return file.replace('.html', '');
+}
 
 function toggleDarkMode() {
   const isDark = document.documentElement.classList.toggle('dark-theme');
@@ -348,10 +359,15 @@ async function fetchJson(url) {
     const timestamp = new Date().getTime();
     const connector = url.includes('?') ? '&' : '?';
     const response = await fetch(`${url}${connector}t=${timestamp}`);
-    if (!response.ok) throw new Error('Network error');
+    if (!response.ok) return null;
+    
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      return null;
+    }
+    
     return await response.json();
   } catch (error) {
-    console.error("Fetch failed:", error);
     return null;
   }
 }
@@ -434,7 +450,6 @@ function initTabSliderSilent(type) {
     slider.style.background = '#f8b8c8';
     if(metaTheme && !document.documentElement.classList.contains('dark-theme')) metaTheme.setAttribute('content', '#f8b8c8');
   } else {
-    // 默认或setu
     currentTab = 'setu';
     slider.style.transform = 'translateX(100%)';
     items[1].classList.add('active');
@@ -497,9 +512,10 @@ async function renderCurrentList(isTabSwitch = false) {
   listDiv.style.opacity = '1';
   const currentPool = currentTab === 'acg' ? allAcgItems : (currentTab === 'setu' ? allSetuItems : allZrsetuItems);
   
+  // 【优化】依靠文件名中的纯期号数字进行准确倒序排列
   currentPool.sort((a, b) => {
-    const numA = parseInt(a.file.match(/\d+/)?.[0] || 0);
-    const numB = parseInt(b.file.match(/\d+/)?.[0] || 0);
+    const numA = parseInt(getIssueNumber(a.file)) || 0;
+    const numB = parseInt(getIssueNumber(b.file)) || 0;
     return numB - numA;
   });
   
@@ -508,11 +524,10 @@ async function renderCurrentList(isTabSwitch = false) {
   if (pageItems.length === 0) {
     listDiv.innerHTML = `<div style="text-align:center;padding:40px;color:#9ca3af;font-weight:600;width:100%;">暂无当前页数据</div>`;
   } else {
-    // 【细节修改点】去掉了 window.open 写死的域名前缀，改为根路径跳转，彻底避免点击项强跳回主站的问题
     listDiv.innerHTML = pageItems.map(item => `
-      <li onclick="window.open('/${currentTab}/${item.file}', '_self')">
+      <li onclick="window.open(getTargetUrl('${item.file}'), '_self')">
         <div class="item-left">
-          <div class="item-title">第 ${item.file.match(/\d+/)?.[0] || '?'} 期</div>
+          <div class="item-title">第 ${getIssueNumber(item.file)} 期</div>
           <div class="item-sub">${item.caption || '精选合集发布'}</div>
         </div>
         <div class="item-btn">点击阅读</div>
@@ -595,7 +610,7 @@ async function preloadAllSearchData() {
   while (true) {
     if (!cachePages[p]) {
       const data = await fetchJson(`${rootUrl}data_pages/${p}.json`);
-      if (!data) break;
+      if (!data) break; 
       cachePages[p] = data;
       
       if (data.acg) {
@@ -626,15 +641,14 @@ function doSearch() {
   const currentPool = currentTab === 'acg' ? allAcgItems : (currentTab === 'setu' ? allSetuItems : allZrsetuItems);
   const matched = currentPool.filter(item => {
     const isCaptionMatch = item.caption && item.caption.toLowerCase().includes(val);
-    const issueNum = item.file.match(/\d+/)?.[0] || '';
+    const issueNum = getIssueNumber(item.file);
     const isNumMatch = issueNum && issueNum.includes(val);
     return isCaptionMatch || isNumMatch;
   });
   
-  // 【细节修改点】搜索结果列表的 window.open 同步去掉写死的域名前缀
   resultsDiv.innerHTML = matched.map(item => `
-    <div class="item" onclick="window.open('/${currentTab}/${item.file}', '_self')">
-      <div class="title">第 ${item.file.match(/\d+/)?.[0] || '?'} 期</div>
+    <div class="item" onclick="window.open(getTargetUrl('${item.file}'), '_self')">
+      <div class="title">第 ${getIssueNumber(item.file)} 期</div>
       <div class="sub">${item.caption || '完整合集'}</div>
     </div>
   `).join('');
@@ -658,7 +672,7 @@ function initTouchEvents() {
 async function startAppNow() {
   initTouchEvents();
   
-  const savedTab = localStorage.getItem('setutime_active_tab') || 'setu'; // 没缓存时，默认选中 setu
+  const savedTab = localStorage.getItem('setutime_active_tab') || 'setu'; 
   initTabSliderSilent(savedTab);
   
   const pBar = document.getElementById('topProgressBar');
@@ -673,7 +687,8 @@ async function startAppNow() {
   
   if (pBar) pBar.style.width = '70%';
   
-  const getCount = arr => (arr && arr.length > 0) ? (parseInt(arr[0].file) || arr.length) : 0;
+  // 【优化】直接通过解析期号来获得精确的统计总计数
+  const getCount = arr => (arr && arr.length > 0) ? (parseInt(getIssueNumber(arr[0].file)) || arr.length) : 0;
   totalAcgCount = getCount(globalData.acg);
   totalSetuCount = getCount(globalData.setu);
   totalZrsetuCount = getCount(globalData.zrsetu);
