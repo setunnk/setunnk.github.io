@@ -6,9 +6,10 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" id="meta-theme-color" content="#428cca"> <!-- 默认修改为二次元晴空蓝 -->
+<link rel="stylesheet" href="https://cdn.jsdmirror.com/gh/FrecklyComb1728/blog@main/public/fonts/xiaolai.css">
 <link rel="icon" href="https://wdcdn.qpic.cn/MTMxMDI2NjEwNzAzNzc4NzY_582527_m5n34EQ_C6U8f2WE_1782832113" type="image/png">
 <meta name="description" content="点击前往SetuTime~">
-<title>SetuTime！</title>
+<title>SetuTime!</title>
 <style>
   /* 核心基础背景 */
   html, body {
@@ -75,8 +76,15 @@
   .loaded ul.list li.show { opacity: 1; transform: translateY(0); }
   
   header { background: transparent; color: #ffffff; padding: 40px 20px 20px; text-align: center; position: relative; }
-  header h1 { margin: 0; font-size: 32px; font-weight: 700; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-  header p { margin: 8px 0 0; opacity: 0.9; font-size: 15px; font-weight: 400; }
+  header h1 { margin: 0; font-size: 37px; font-weight: 700; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+  header p { 
+    margin: 8px 0 0; 
+    opacity: 0.9; 
+    font-size: 18px; /* 适当调大一点字号，让手写卡通字更显眼 */
+    font-weight: 400; 
+    font-family: 'xiaolai', -apple-system, BlinkMacSystemFont, sans-serif; /* 使用一模一样的小濑字体 */
+    letter-spacing: 0.5px; 
+  }
   
   .main-wrapper {
     background: #ffffff;
@@ -105,7 +113,7 @@
   
   .item-left { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 0; text-align: left; padding-right: 12px; }
   .item-title { font-size: 16px; font-weight: 600; color: #111827; white-space: nowrap; }
-  .item-sub { font-size: 13px !important; color: #6b7280 !important; line-height: 1.5 !important; white-space: normal !important; word-break: break-all !important; overflow: visible !important; }
+  .item-sub { font-size: 13px !important; color: #6b7280 !important; line-height: 1.5 !important; white-space: normal !important; word-break: break-all !important; overflow: visible !important; flex: 1; }
   
   .item-btn { background: #f3f4f6; color: #4b5563; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; transition: all 0.25s; flex-shrink: 0; user-select: none; }
   ul.list li:hover .item-btn { background: #428cca; color: #ffffff; }
@@ -215,8 +223,8 @@
     <svg class="sun-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
     <svg class="moon-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
   </div>
-  <h1 id="main-title">SetuTime！</h1>
-  <p id="sub-title">ACGエッチ画像まとめ</p> <!-- 默认改为二次元副标题 -->
+  <h1 id="main-title">SetuTime</h1>
+  <p id="sub-title">ACGエッチ画像まとめ</p>
 </header>
 
 <div class="main-wrapper">
@@ -309,7 +317,8 @@ let totalZrsetuCount = 0;
 const ITEMS_PER_PAGE = 10;
 const SERVER_ITEMS_PER_FILE = 50;
 
-const rootUrl = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost' ? '/' : 'https://setutime.com/';
+// 【核心修改点】完美兼容 index.setutime.com 等任意子域名的动态路径获取机制
+const rootUrl = `${window.location.protocol}//${window.location.host}/`;
 
 function toggleDarkMode() {
   const isDark = document.documentElement.classList.toggle('dark-theme');
@@ -369,21 +378,21 @@ function handleTabClick(type, index) {
   document.body.classList.remove('blue-theme', 'pink-theme', 'green-theme');
   
   if (type === 'setu') {
-    mainTitle.innerText = "SetuTime！";
+    mainTitle.innerText = "SetuTime!";
     subTitle.innerText = "ACGエッチ画像まとめ";
     slider.style.background = '#428cca';
     if(metaTheme && !document.documentElement.classList.contains('dark-theme')) metaTheme.setAttribute('content', '#428cca');
   } else if (type === 'zrsetu') {
     document.documentElement.classList.add('pink-theme');
     document.body.classList.add('pink-theme');
-    mainTitle.innerText = "SetuTime！";
+    mainTitle.innerText = "SetuTime!";
     subTitle.innerText = "Cosplayエッチ画像まとめ";
     slider.style.background = '#f8b8c8';
     if(metaTheme && !document.documentElement.classList.contains('dark-theme')) metaTheme.setAttribute('content', '#f8b8c8');
   } else {
     document.documentElement.classList.add('green-theme');
     document.body.classList.add('green-theme');
-    mainTitle.innerText = "SetuTime！";
+    mainTitle.innerText = "SetuTime!";
     subTitle.innerText = "全年龄向ACGイラストまとめ";
     slider.style.background = '#50C878';
     if(metaTheme && !document.documentElement.classList.contains('dark-theme')) metaTheme.setAttribute('content', '#50C878');
@@ -410,7 +419,7 @@ function initTabSliderSilent(type) {
     items[0].classList.add('active');
     document.documentElement.classList.add('green-theme');
     document.body.classList.add('green-theme');
-    mainTitle.innerText = "SetuTime！";
+    mainTitle.innerText = "SetuTime!";
     subTitle.innerText = "全年龄向ACGイラストまとめ";
     slider.style.background = '#50C878';
     if(metaTheme && !document.documentElement.classList.contains('dark-theme')) metaTheme.setAttribute('content', '#50C878');
@@ -420,7 +429,7 @@ function initTabSliderSilent(type) {
     items[2].classList.add('active');
     document.documentElement.classList.add('pink-theme');
     document.body.classList.add('pink-theme');
-    mainTitle.innerText = "SetuTime！";
+    mainTitle.innerText = "SetuTime!";
     subTitle.innerText = "Cosplayエッチ画像まとめ";
     slider.style.background = '#f8b8c8';
     if(metaTheme && !document.documentElement.classList.contains('dark-theme')) metaTheme.setAttribute('content', '#f8b8c8');
@@ -429,7 +438,7 @@ function initTabSliderSilent(type) {
     currentTab = 'setu';
     slider.style.transform = 'translateX(100%)';
     items[1].classList.add('active');
-    mainTitle.innerText = "SetuTime！";
+    mainTitle.innerText = "SetuTime!";
     subTitle.innerText = "ACGエッチ画像まとめ";
     slider.style.background = '#428cca';
     if(metaTheme && !document.documentElement.classList.contains('dark-theme')) metaTheme.setAttribute('content', '#428cca');
@@ -452,7 +461,7 @@ async function renderCurrentList(isTabSwitch = false) {
   
   const activePage = currentPage[currentTab];
   const totalCount = currentTab === 'acg' ? totalAcgCount : (currentTab === 'setu' ? totalSetuCount : totalZrsetuCount);
-  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE) || 1;
+  const totalPagesRaw = Math.ceil(totalCount / ITEMS_PER_PAGE) || 1;
   
   const startIdx = (activePage - 1) * ITEMS_PER_PAGE;
   const endIdx = activePage * ITEMS_PER_PAGE;
@@ -493,14 +502,25 @@ async function renderCurrentList(isTabSwitch = false) {
     const numB = parseInt(b.file.match(/\d+/)?.[0] || 0);
     return numB - numA;
   });
+
+  // 【核心修改】如果是二次元篇(setu)或cos篇(zrsetu)，过滤掉标题包含🔞的项目[cite: 1]
+  let filteredPool = currentPool;
+  if (currentTab === 'setu' || currentTab === 'zrsetu') {
+    filteredPool = currentPool.filter(item => !item.caption || !item.caption.includes('🔞'));
+  }
+
+  // 根据过滤后的池大小重新精确计算总页数[cite: 1]
+  const totalPages = Math.ceil(filteredPool.length / ITEMS_PER_PAGE) || 1;
   
-  const pageItems = currentPool.slice(startIdx, endIdx);
+  // 使用过滤后的数据池进行分页切片[cite: 1]
+  const pageItems = filteredPool.slice(startIdx, endIdx);
   
   if (pageItems.length === 0) {
     listDiv.innerHTML = `<div style="text-align:center;padding:40px;color:#9ca3af;font-weight:600;width:100%;">暂无当前页数据</div>`;
   } else {
+    // 【细节修改点】去掉了 window.open 写死的域名前缀，改为根路径跳转，彻底避免点击项强跳回主站的问题
     listDiv.innerHTML = pageItems.map(item => `
-      <li onclick="window.open('${rootUrl}${currentTab}/${item.file}', '_self')">
+      <li onclick="window.open('/${currentTab}/${item.file}', '_self')">
         <div class="item-left">
           <div class="item-title">第 ${item.file.match(/\d+/)?.[0] || '?'} 期</div>
           <div class="item-sub">${item.caption || '精选合集发布'}</div>
@@ -533,8 +553,12 @@ async function renderCurrentList(isTabSwitch = false) {
 }
 
 function handleInputJump(val) {
-  const totalCount = currentTab === 'acg' ? totalAcgCount : (currentTab === 'setu' ? totalSetuCount : totalZrsetuCount);
-  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE) || 1;
+  const currentPool = currentTab === 'acg' ? allAcgItems : (currentTab === 'setu' ? allSetuItems : allZrsetuItems);
+  let filteredPool = currentPool;
+  if (currentTab === 'setu' || currentTab === 'zrsetu') {
+    filteredPool = currentPool.filter(item => !item.caption || !item.caption.includes('🔞'));
+  }
+  const totalPages = Math.ceil(filteredPool.length / ITEMS_PER_PAGE) || 1;
   let pageNum = parseInt(val);
   
   if (isNaN(pageNum)) {
@@ -556,8 +580,12 @@ function handleInputJump(val) {
 
 function changePage(direction) {
   const activePage = currentPage[currentTab];
-  const totalCount = currentTab === 'acg' ? totalAcgCount : (currentTab === 'setu' ? totalSetuCount : totalZrsetuCount);
-  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE) || 1;
+  const currentPool = currentTab === 'acg' ? allAcgItems : (currentTab === 'setu' ? allSetuItems : allZrsetuItems);
+  let filteredPool = currentPool;
+  if (currentTab === 'setu' || currentTab === 'zrsetu') {
+    filteredPool = currentPool.filter(item => !item.caption || !item.caption.includes('🔞'));
+  }
+  const totalPages = Math.ceil(filteredPool.length / ITEMS_PER_PAGE) || 1;
   
   const newPage = activePage + direction;
   if (newPage < 1 || newPage > totalPages) return;
@@ -615,14 +643,19 @@ function doSearch() {
   
   const currentPool = currentTab === 'acg' ? allAcgItems : (currentTab === 'setu' ? allSetuItems : allZrsetuItems);
   const matched = currentPool.filter(item => {
+    // 【核心修改】在搜索时，针对二次元篇和cos篇，如果标题包含🔞直接排除[cite: 1]
+    if ((currentTab === 'setu' || currentTab === 'zrsetu') && item.caption && item.caption.includes('🔞')) {
+      return false;
+    }
     const isCaptionMatch = item.caption && item.caption.toLowerCase().includes(val);
     const issueNum = item.file.match(/\d+/)?.[0] || '';
     const isNumMatch = issueNum && issueNum.includes(val);
     return isCaptionMatch || isNumMatch;
   });
   
+  // 【细节修改点】搜索结果列表的 window.open 同步去掉写死的域名前缀
   resultsDiv.innerHTML = matched.map(item => `
-    <div class="item" onclick="window.open('${rootUrl}${currentTab}/${item.file}', '_self')">
+    <div class="item" onclick="window.open('/${currentTab}/${item.file}', '_self')">
       <div class="title">第 ${item.file.match(/\d+/)?.[0] || '?'} 期</div>
       <div class="sub">${item.caption || '完整合集'}</div>
     </div>
@@ -671,14 +704,16 @@ async function startAppNow() {
   allSetuItems = (globalData.setu || []);
   allZrsetuItems = (globalData.zrsetu || []);
   
-  const maxAcgPages = Math.ceil(totalAcgCount / ITEMS_PER_PAGE) || 1;
-  const maxSetuPages = Math.ceil(totalSetuCount / ITEMS_PER_PAGE) || 1;
-  const maxZrsetuPages = Math.ceil(totalZrsetuCount / ITEMS_PER_PAGE) || 1;
-  if (currentPage.acg > maxAcgPages) currentPage.acg = maxAcgPages;
-  if (currentPage.setu > maxSetuPages) currentPage.setu = maxSetuPages;
-  if (currentPage.zrsetu > maxZrsetuPages) currentPage.zrsetu = maxZrsetuPages;
-  
+  // 预先初始化完数据后再加载列表，保证首次计算过滤页码时数据已被注入
   await renderCurrentList();
+  
+  const currentPool = currentTab === 'acg' ? allAcgItems : (currentTab === 'setu' ? allSetuItems : allZrsetuItems);
+  let filteredPool = currentPool;
+  if (currentTab === 'setu' || currentTab === 'zrsetu') {
+    filteredPool = currentPool.filter(item => !item.caption || !item.caption.includes('🔞'));
+  }
+  const maxPages = Math.ceil(filteredPool.length / ITEMS_PER_PAGE) || 1;
+  if (currentPage[currentTab] > maxPages) currentPage[currentTab] = maxPages;
   
   if (pBar) {
     pBar.style.width = '100%';
