@@ -1,8 +1,12 @@
 {
-  "updated": "2026-7-20 16:25:07",
+  "updated": "2026-7-20 17:13:51",
   "acg": [],
   "setu": [],
   "zrsetu": [
+    {
+      "file": "138.html",
+      "caption": "# PoppaChan - Coco Kiryuu (Hololive)"
+    },
     {
       "file": "137.html",
       "caption": "# PoppaChan - Artoria Pendragon (Fate)"
@@ -198,10 +202,6 @@
     {
       "file": "89.html",
       "caption": "# 桜井宁宁 - 风纪委员"
-    },
-    {
-      "file": "88.html",
-      "caption": "# 面饼仙儿 - 白色旗袍"
     }
   ]
 }
