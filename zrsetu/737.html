@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<link rel="icon" href="https://wdcdn.qpic.cn/MTMxMDI2NjEwNzAzNzc4NzY_4700_9lFpTYi119_srYPg_1782843137" type="image/png">
+<title>涩图time</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  background: #fafafa;
+  color: #333;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 100%;
+  padding: 15px;
+}
+
+.header {
+  text-align: center;
+  padding: 20px 0;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1e1e1e;
+}
+#setu-title {
+    display: block !important;
+    text-align: left !important;
+    width: 100% !important; 
+    max-width: min(92vw, 700px);
+    margin: 15px auto 25px !important; 
+    background-color: #f2f4f6 !important; 
+    border-radius: 999px !important;
+    padding: 12px 25px 12px 35px !important;
+    
+    font-size: 15px;
+    font-weight: 500;
+    color: #4a5568; 
+    line-height: 1.6;
+    
+    border: none;
+    box-sizing: border-box;
+    word-wrap: break-word;
+}
+
+.image-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+  max-width: min(90vw, 700px);
+  margin: 0 auto;
+}
+
+.image-item {
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, .06);
+  background: #f0f2f5;
+  position: relative;
+}
+
+/* 合并后的 .img-wrap：骨架屏 + 图片容器 */
+.img-wrap {
+  position: relative;
+  width: 100%;
+  min-height: 180px;
+  background: #f3f4f6; 
+  overflow: hidden;
+}
+
+/* shimmer 动画层 */
+.img-wrap::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #f3f4f6 0%, #e9eef6 50%, #f3f4f6 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite ease-in-out;
+  z-index: 1;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* 图片本身：淡入 + 保持比例 */
+.img-wrap img {
+  width: 100%;
+  height: auto;
+  display: block;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: 2;
+  object-fit: contain;
+  position: relative;
+}
+
+/* 加载完成：移除 shimmer，显示图片 */
+.img-wrap.loaded::before {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.img-wrap.loaded img {
+  opacity: 1;
+}
+
+/* ===== 下载模块 ===== */
+.explanation {
+  background: linear-gradient(135deg, #f2f4f6, #eceef0);
+  border: 1px solid #dde2e9;
+  border-radius: 16px;
+  padding: 22px;
+  text-align: center;
+  color: #4a5568;
+  margin: 25px 0;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.explanation h2 {
+  font-size: 20px;
+  color: #2d2d2d;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.explanation p {
+  font-size: 15px;
+  color: #506070;
+}
+
+.explanation p span {
+  color: #2d3748;
+  font-weight: 700;
+  text-shadow: 0 0 8px rgba(45, 55, 72, 0.3);
+}
+
+.preserve {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 210px;              /* 下载模块按钮宽度 */
+  max-width: 100%;
+  height: 46px;
+  margin: 15px auto 0;
+  background: linear-gradient(135deg, #5db85d, #4cae4c);
+  box-shadow: 0 6px 16px rgba(93, 184, 93, 0.35);
+  
+  border-radius: 999px;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.1rem;
+  transition: all .3s ease;
+  box-sizing: border-box;
+}
+
+.preserve:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #67c267, #5db85d);
+  box-shadow: 0 8px 22px rgba(93, 184, 93, 0.45);
+}
+
+.save {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 280px;
+    height: 46px;
+    margin: 0 auto;
+    padding: 0;
+    background: #f5f5f5;
+    color: #666;
+    border: 1px solid #e0e0e0;
+    border-radius: 999px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    line-height: 1;
+    box-sizing: border-box;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: all .3s ease;
+    font-family: -apple-system, sans-serif;
+}
+
+.save:hover {
+    background: #eeeeee;
+    color: #333;
+    transform: translateY(-2px); 
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* --- 底部悬浮按钮样式 --- */
+.fixed-button {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%) scale(1);
+  width: calc(100% - 80px);
+  max-width: 500px;
+  z-index: 1000;
+  will-change: transform, opacity; 
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+.fixed-button.hidden {
+  transform: translateX(-50%) translateY(20px) scale(0.85);
+  opacity: 0;
+}
+
+.fixed-button a {
+  display: block;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  color: #000 !important;
+  padding: 10px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 600;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  border: 1px solid rgba(255,255,255,0.6);
+  pointer-events: auto;
+  transition: .3s;
+}
+
+.fixed-button a:hover {
+  background: rgba(255, 255, 255, 0.95) !important;
+  transform: translateY(-2px);
+}
+
+/* 下一期模块 */
+.prev-next-link {
+  display: block;
+  margin: 15px 0 40px;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.prev-next-card {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  background: #000000;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.next-text {
+  color: #ffffff;
+  font-family: "PingFang SC", -apple-system, sans-serif;
+  font-weight: 800;
+  font-size: 1.8rem;
+  letter-spacing: 2px;
+  z-index: 2;
+}
+
+.next-sub {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.75rem;
+  letter-spacing: 4px;
+  margin-top: 8px;
+  z-index: 2;
+  text-transform: uppercase;
+}
+
+.responsive-video {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  object-fit: contain;
+}
+  
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1 class="title">涩图time No.737</h1>
+  </div>
+
+  <div class="image-grid">
+ 
+    <div id="setu-title" class="title-capsule">
+      # ran3_染三 - 崩坏星穹铁道_银狼_衬衫 [158P] 
+</div>
+     
+    <div style="text-align:center;">
+<a href="#" class="save save-blue">>>>原图保存<<<</a>
+</div>
+
+    
+
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-14453c322a34ce779.webp" alt="1"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-257f2f4505ca39e45.webp" alt="2"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-3dd49ba00d9fb20ee.webp" alt="3"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-471586dd591e8206d.webp" alt="4"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-57296f8b4bfa24315.webp" alt="5"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-6be4f5b545b5d88c3.webp" alt="6"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-7cab384e537f49506.webp" alt="7"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-86b1119d1687a2f4e.webp" alt="8"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-9f0b52e1e3bde2fc9.webp" alt="9"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-10868a003f557e8b9e.webp" alt="10"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-11a13dcb9f254cbbfc.webp" alt="11"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-12b025f8e659f24b81.webp" alt="12"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-1360baf17dfe218325.webp" alt="13"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-1496c68986dad4f8d5.webp" alt="14"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-15b5c3b30c5b9d6d9c.webp" alt="15"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-1680724989407a310d.webp" alt="16"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-17ccf8c701d94d4caf.webp" alt="17"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-185b5ba27c7c0d951e.webp" alt="18"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-1968bc83f61e5a889c.webp" alt="19"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-20c906678261151461.webp" alt="20"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-216fe15b3b7232895b.webp" alt="21"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-22402fd03ef8d28a7a.webp" alt="22"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-23c7ac39025e0ef5ea.webp" alt="23"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-24fb621af2192ed02e.webp" alt="24"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-25e97e870a53a5edb8.webp" alt="25"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-26431311afcf0cd7df.webp" alt="26"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-27b2c7dcc6cabf7de5.webp" alt="27"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-28303309d6fce8d31e.webp" alt="28"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-29cec85175705c7dbc.webp" alt="29"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-307c8bfb0991e1a93e.webp" alt="30"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-316c764ae496e3da2c.webp" alt="31"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-3292fa4898d60b163c.webp" alt="32"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-33f0ef75b4751bf6a9.webp" alt="33"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-348fb402fdee7ffc14.webp" alt="34"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-352aae6a1db38f79f9.webp" alt="35"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-36f513162daed8d14a.webp" alt="36"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-370fb1197446efd3d1.webp" alt="37"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-3841ed4bfd1d44efc3.webp" alt="38"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-39dd48a096186660d5.webp" alt="39"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-40c232060ff7a2b24a.webp" alt="40"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-41da9447e050fbaa94.webp" alt="41"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-420331a9d0215a91d8.webp" alt="42"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-435f781ee5ded27f8b.webp" alt="43"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-44cd8bd075143ae3a3.webp" alt="44"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-45983bc44ddd61ae1b.webp" alt="45"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-46e0ec70c61c10bff7.webp" alt="46"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-478a00bbdd5359c521.webp" alt="47"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-483dda2bb7d8434012.webp" alt="48"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-49b32521e376f3956c.webp" alt="49"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-50723033db093eef61.webp" alt="50"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-51424d78dc0bf49efe.webp" alt="51"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-52d8cf039c1e0f42f7.webp" alt="52"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-533adb4796aaa39ad7.webp" alt="53"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-5432c71d32988277e9.webp" alt="54"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-55b9f4b36e8d8fbca9.webp" alt="55"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-566d43abccbe17c219.webp" alt="56"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-57065e202b6bf4fb3e.webp" alt="57"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-58f479da7c33634b34.webp" alt="58"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-5926fe67331b4982b5.webp" alt="59"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-609aea54b2f7d3e9db.webp" alt="60"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-61690230e255b35c7d.webp" alt="61"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-6240d706784f7bf2f0.webp" alt="62"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-631dfc329502f07f8f.webp" alt="63"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-64bcdafef0bb43507d.webp" alt="64"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-6534cf448305f968fd.webp" alt="65"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-66b8a6a76e36858545.webp" alt="66"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-67de23364448b6d599.webp" alt="67"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-68305f263ec3f3e15b.webp" alt="68"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-69c211b5c3686241f5.webp" alt="69"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-70792b3d851a64b611.webp" alt="70"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-71b7ae3ed7fb0ce7ff.webp" alt="71"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-726ef573dca80e5fd0.webp" alt="72"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-73befaf8f4cd8087eb.webp" alt="73"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-74ceb74d84846884d3.webp" alt="74"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-7573e6b7e349bb7e3f.webp" alt="75"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-76adf9e3b480a4e032.webp" alt="76"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-77649e082bb87b9162.webp" alt="77"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-7822f5a42419bb95e3.webp" alt="78"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-79635bb4deb3e6a88a.webp" alt="79"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-8006de8f8bce277ca4.webp" alt="80"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-8195da0484c8acf9b1.webp" alt="81"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-82e831f6442fe16731.webp" alt="82"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-83a896c727901f5e6f.webp" alt="83"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-8445b0bd5c3b8f22ba.webp" alt="84"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-8568dc9091980954c2.webp" alt="85"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-86f587c482bfe34187.webp" alt="86"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-874a6eaf1fcec874b7.webp" alt="87"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-88e2dde7d8cc7f67f7.webp" alt="88"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-89bf99e74f16df2075.webp" alt="89"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-90e0b4c5fb6ee4acaf.webp" alt="90"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-91a0f815f51f9f598b.webp" alt="91"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-92507d5dad880cb8a6.webp" alt="92"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-931be90c23440ac7b0.webp" alt="93"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-9421b6f94da38fe773.webp" alt="94"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-9559bc701d9421cd99.webp" alt="95"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-96e697ca038ef1a250.webp" alt="96"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-97f5f5465a645293fc.webp" alt="97"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-98c79e64acc088c16c.webp" alt="98"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-995517d27b0a8d6bf3.webp" alt="99"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-1009dd189f3395acd82.webp" alt="100"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-1012425711978816ef7.webp" alt="101"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-102f2ac5da7b1163c9c.webp" alt="102"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-103b654443f8bfbe6dd.webp" alt="103"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-104d5a57759f037ac9a.webp" alt="104"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-10597ac4aab7acfe090.webp" alt="105"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-106470f80bf658b2bce.webp" alt="106"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-107800694f8dc1fbd90.webp" alt="107"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-10841f1f5afe5e95cbe.webp" alt="108"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-1098bb797670fb2c228.webp" alt="109"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-110e30ee288918856bf.webp" alt="110"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-11134b91dd5f161e536.webp" alt="111"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-112bb560de49bb7225f.webp" alt="112"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-113.webp" alt="113"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-114893e8aa19a3a68f7.webp" alt="114"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-115.webp" alt="115"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-116.webp" alt="116"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-117.webp" alt="117"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-118.webp" alt="118"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-119.webp" alt="119"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-120.webp" alt="120"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-121.webp" alt="121"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-122.webp" alt="122"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-1237de1917cd4b2708b.webp" alt="123"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-124.webp" alt="124"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-125.webp" alt="125"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-126.webp" alt="126"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-127.webp" alt="127"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-128.webp" alt="128"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-129.webp" alt="129"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-130.webp" alt="130"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-131.webp" alt="131"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-13285f3312bc43a265c.webp" alt="132"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-133.webp" alt="133"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-134357933a90354bb94.webp" alt="134"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-135a9a8bc5e54beaddd.webp" alt="135"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-1369572a493787cbcf3.webp" alt="136"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-137d07639919c6088d4.webp" alt="137"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-1383fb26cf0c4111e9b.webp" alt="138"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-13970d41c4014673b4f.webp" alt="139"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-140d4448f5c4e2e6a32.webp" alt="140"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-1413493966ca3194449.webp" alt="141"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-1424afd79dc610f16e2.webp" alt="142"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-1434bb8d3d515438db7.webp" alt="143"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-1442399db8c11b42383.webp" alt="144"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-145fdf4b671ea6f84a9.webp" alt="145"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-146332003e90a278cdf.webp" alt="146"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-14717de883553c21664.webp" alt="147"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-1487594cfb06f2124a7.webp" alt="148"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-14909a97c4f51128d6b.webp" alt="149"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-150bc741c98295f49a8.webp" alt="150"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-151fb0be3a05db1ce05.webp" alt="151"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-1521ed7ace37f4b03c4.webp" alt="152"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-1532941ceb47985dcf1.webp" alt="153"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-154d1f9325924d03302.webp" alt="154"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-1556b7dd87cab154bda.webp" alt="155"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-1561f81dcff2983fcb8.webp" alt="156"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-1579779036b5e86f3cb.webp" alt="157"></div></div>
+<div class="image-item"><div class="img-wrap"><img data-src="https://image.acg.lol/file/2026/07/20/pic-737-1584f5b61aea46f07d8.webp" alt="158"></div></div>
+
+
+    <div class="explanation">
+      <h2>本期无水印原图</h2>
+ <a href="" target="_blank" class="preserve">>>>原图保存<<<</a>
+    </div>
+    
+    <a href="#" id="prev-link" class="prev-next-link">
+        <div class="prev-next-card">
+            <span class="next-text">跳转下一期 >>></span>
+            <span id="prev-sub" class="next-sub">Next Issue Gallery</span>
+        </div>
+    </a><br>
+
+  <div class="fixed-button"><a href="/">SetuTime 合集</a>
+</div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    if ('IntersectionObserver' in window) {
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    const wrap = img.parentElement;
+                    if (img.dataset.src) {
+                        img.src = img.dataset.src;
+                        img.onload = () => { wrap.classList.add('loaded'); };
+                    }
+                    observer.unobserve(img);
+                }
+            });
+        }, { rootMargin: "0px 0px 300px 0px" });
+
+        const imgs = document.querySelectorAll('.img-wrap img');
+        imgs.forEach(img => imageObserver.observe(img));
+    } else {
+        const imgs = document.querySelectorAll('.img-wrap img');
+        imgs.forEach(img => {
+            img.src = img.dataset.src;
+            img.onload = () => img.parentElement.classList.add('loaded');
+        });
+    }
+    const titleEl = document.querySelector('.title');
+    if (titleEl) {
+        const match = titleEl.innerText.match(/\d+/);
+        if (match) {
+            const currentNo = parseInt(match[0]);
+            const prevNo = currentNo - 1;
+            const prevLink = document.getElementById('prev-link');
+            if (prevLink) {
+                prevLink.href = `https://setutime.com/zrsetu/${prevNo}`;
+            }
+            const downloadUrl = `https://dl.setutime.com/support?id=zrsetu_${currentNo}`;
+            const topSaveBtn = document.querySelector('.save-blue');
+            if (topSaveBtn) {
+                topSaveBtn.href = downloadUrl;
+            }
+            const bottomSaveBtn = document.querySelector('.preserve');
+            if (bottomSaveBtn) {
+                bottomSaveBtn.href = downloadUrl;
+            }
+        }
+    }
+
+
+    const fixedBtn = document.querySelector('.fixed-button');
+    let lastScrollY = window.scrollY;
+    let ticking = false;
+
+    function updateButtonVisibility() {
+        const currentScrollY = window.scrollY;
+        if (currentScrollY > lastScrollY && currentScrollY > 10) {
+            fixedBtn.classList.add('hidden');
+        } else {
+            fixedBtn.classList.remove('hidden');
+        }
+        lastScrollY = currentScrollY;
+        ticking = false;
+    }
+
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            window.requestAnimationFrame(updateButtonVisibility);
+            ticking = true;
+        }
+    });
+});
+</script>
+</body>
+</html>
